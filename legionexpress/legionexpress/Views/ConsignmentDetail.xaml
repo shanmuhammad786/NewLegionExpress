@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="legionexpress.Views.ConsignmentDetail"
+             NavigationPage.HasNavigationBar="False">
+    <ContentPage.Content>
+        <StackLayout>
+            <Image Source="legionLogo" HeightRequest="70" Margin="0,20"/>
+            <ScrollView>
+                <Grid Margin="20,0,20,20" ColumnDefinitions="*" RowDefinitions="*" ColumnSpacing="0">
+                    <StackLayout Grid.Row="0" Grid.Column="0" Spacing="0" >
+                        <StackLayout  Margin="25, 10">
+                            <Label Text="Aimee Corbett JMF Print Ltd 5," FontAttributes="Italic"  FontSize="15" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <Label Text="Sands Industrial Estate Newcastle Upon Tyne" FontAttributes="Italic" FontSize="15" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <Label Text="NE16 3DJ" FontAttributes="Italic" FontSize="15" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                        </StackLayout>
+                        <Label Text="Tel: 01914882011" FontAttributes="Bold" TextColor="Black" FontSize="12" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                        <BoxView HorizontalOptions="Fill" HeightRequest="1" Color="#6E6259"/>
+                        <StackLayout Orientation="Horizontal" Spacing="0">
+                            <BoxView VerticalOptions="Fill" HorizontalOptions="Start" WidthRequest="1" Color="#6E6259"/>
+                            <Label Text="Delivery Instructions" FontAttributes="Bold" TextColor="Black" FontSize="15" HorizontalOptions="CenterAndExpand" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                        </StackLayout>
+                        <BoxView HorizontalOptions="Fill" HeightRequest="1" Color="#6E6259"/>
+                        <StackLayout Orientation="Horizontal" Spacing="0">
+                            <BoxView VerticalOptions="Fill" HorizontalOptions="Start" WidthRequest="1" Color="#6E6259"/>
+                            <Label Text="Please leave with reception" Margin="10,0" FontAttributes="Italic" FontSize="13" HorizontalOptions="CenterAndExpand" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                        </StackLayout>
+                        <BoxView HorizontalOptions="Fill" HeightRequest="1" Color="#6E6259"/>
+                    </StackLayout>
+                        <BoxView  
+                            VerticalOptions="Fill"
+                            HorizontalOptions="End"
+                            WidthRequest="1"
+                            Color="#6E6259"/>
+                    <StackLayout Grid.Column="1" Grid.Row="0" Spacing="0">
+                        <BoxView HorizontalOptions="Fill" HeightRequest="1" Color="#6E6259"/>
+                        <StackLayout Orientation="Horizontal" Spacing="0">
+                            <Label Text="Items" Margin="4,0" FontAttributes="Bold" TextColor="Black"  HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <BoxView VerticalOptions="Fill" HorizontalOptions="Center" WidthRequest="1" CornerRadius="50" Color="#6E6259"/>
+                            <Label Text="Weight"  FontAttributes="Bold" TextColor="Black" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <BoxView VerticalOptions="Fill" HorizontalOptions="Center"  WidthRequest="1" Color="#6E6259"/>
+                        </StackLayout>
+                        <BoxView HorizontalOptions="Fill" HeightRequest="1" Color="#6E6259"/>
+                        <StackLayout Orientation="Horizontal" Spacing="0">
+                            <Label Text="1" FontAttributes="Italic"  HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <BoxView VerticalOptions="Fill" HorizontalOptions="Center" WidthRequest="1" Color="#6E6259"/>
+                            <Label Text="3" FontAttributes="Italic"  HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <BoxView VerticalOptions="Fill" HorizontalOptions="Center" WidthRequest="1" Color="#6E6259"/>
+                        </StackLayout>
+                        <BoxView HorizontalOptions="Fill" HeightRequest="1" Color="#6E6259"/>
+                        <StackLayout Orientation="Horizontal" Spacing="0">
+                            <Label Text="Service level" FontAttributes="Bold" TextColor="Black" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <BoxView VerticalOptions="Fill" HorizontalOptions="End" WidthRequest="1" Color="#6E6259"/>
+                        </StackLayout>
+                        <BoxView HorizontalOptions="Fill" HeightRequest="1" Color="#6E6259"/>
+                        <StackLayout Orientation="Horizontal" Spacing="0">
+                            <Label Text="Next Day" FontAttributes="Italic" FontSize="13"  HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <BoxView VerticalOptions="Fill" HorizontalOptions="End" WidthRequest="1" Color="#6E6259"/>
+                        </StackLayout>
+                        <BoxView HorizontalOptions="Fill" HeightRequest="1" Color="#6E6259"/>
+
+                    </StackLayout>
+                </Grid>
+            </ScrollView>
+            <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="EndAndExpand" Margin="20,20">
+                <StackLayout Orientation="Horizontal" Margin="0,10">
+                    <Button Text="Edit" TextColor="White" BackgroundColor="#6E6259" HorizontalOptions="FillAndExpand"/>
+                    <Button Text="Save" TextColor="White" BackgroundColor="#FF5E00" HorizontalOptions="FillAndExpand"/>
+                </StackLayout>
+                <Button Text="Cancel" BackgroundColor="White" TextColor="#6E6259" BorderColor="#6E6259" BorderWidth="1" CornerRadius="5" />
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

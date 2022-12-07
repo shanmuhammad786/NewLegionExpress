@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rg:PopupPage  xmlns:rg="http://rotorgames.com" 
+               xmlns="http://xamarin.com/schemas/2014/forms"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup"
+               x:Class="legionexpress.Popups.ChangeNetwork">
+    <rg:PopupPage.Animation>
+        <animations:ScaleAnimation 
+            PositionIn="Bottom"
+            PositionOut="Bottom"
+            DurationIn="150"
+            DurationOut="150"
+            EasingIn="SinOut"
+            EasingOut="SinIn"
+            HasBackgroundAnimation="True"/>
+    </rg:PopupPage.Animation>
+    <StackLayout 
+        VerticalOptions="CenterAndExpand" 
+        BackgroundColor="Transparent"
+        HorizontalOptions="FillAndExpand" 
+       >
+        <Frame CornerRadius="20"  HorizontalOptions="FillAndExpand" BackgroundColor=" #000000 " HeightRequest="400" >
+            <StackLayout>
+                <BoxView HeightRequest="1" BackgroundColor="White" Margin="80,0"/>
+                <Label HorizontalTextAlignment="Center" Text="Change Network" TextColor="White" FontSize="20"></Label>
+                <Frame Margin="10,20,10,0" Padding="5" CornerRadius="10" BackgroundColor="#000000">
+                    <StackLayout>
+                        <ListView ItemsSource="{Binding NetworkList}" HasUnevenRows="True" SeparatorVisibility="None" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <Frame  CornerRadius="10" Margin="10" Padding="15" BackgroundColor="{Binding BackgroundColor}">
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label Text="{Binding name}" VerticalOptions="CenterAndExpand" TextColor="White"/>
+                                                <Image Source="{Binding Image}" HorizontalOptions="EndAndExpand" HeightRequest="20"/>
+                                            </StackLayout>
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                                            </Frame.GestureRecognizers>
+                                        </Frame>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackLayout>
+                    <!--<Picker Title="Select a Network"
+                        TitleColor="Black"
+                        ItemsSource="{Binding NetworkList}"
+                        ItemDisplayBinding="{Binding name}" 
+                        SelectedItem="{Binding SelectedNetwork}"
+                        />-->
+                </Frame>
+                <Button Text="Cancel" Margin="0,20,0,0" Command="{Binding ClosePopupCommand}" BackgroundColor="White" TextColor="Black" CornerRadius="10" />
+
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+</rg:PopupPage>
