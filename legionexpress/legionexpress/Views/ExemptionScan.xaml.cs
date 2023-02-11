@@ -38,7 +38,7 @@ namespace legionexpress.Views
 
         private async void Cancel_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new Home());
+            await Navigation.PushAsync(new CollectionHome());
         }
     }
 }

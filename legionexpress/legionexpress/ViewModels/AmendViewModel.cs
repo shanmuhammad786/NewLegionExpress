@@ -12,21 +12,32 @@ namespace legionexpress.ViewModels
 {
     public class AmendViewModel : BaseViewModel
     {
+        #region PrivateProperties
         ShipmentService _service;
         private string _btnText;
         private string _notes;
         private string _weight;
         private string _holdReleaseNote;
         private bool _isRunning;
+        private string _amendPriceNote
+;
         private Color _addNoteColor;
         private Color _networkChangeColor;
         private Color _addWeightColor;
         private Color _volumiseColor;
         private Color _reprintLabelColor;
         private Color _holdColor;
+        private Color _nonDataBagColor;
+        private Color _palletColor;
+        private Color _residentialColor;
+        private Color _lengthGreaterThanThreeColor;
+        private Color _lengthLessThanThreeColor;
+        private Color _amendPriceColor;
         string length = string.Empty;
         string width = string.Empty;
         string height = string.Empty;
+        #endregion
+        #region PublicProperties
         public bool IsRunning
         {
             get
@@ -159,6 +170,103 @@ namespace legionexpress.ViewModels
                 NotifyPropertyChanged();
             }
         }
+        public Color NonDataBagColor
+        {
+            get
+            {
+                return _nonDataBagColor;
+            }
+            set
+            {
+                _nonDataBagColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public Color PriceAmendColor
+        {
+            get
+            {
+                return _holdColor;
+            }
+            set
+            {
+                _holdColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public Color PalletColor
+        {
+            get
+            {
+                return _palletColor;
+            }
+            set
+            {
+                _palletColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public Color ResidentialColor
+        {
+            get
+            {
+                return _residentialColor;
+            }
+            set
+            {
+                _residentialColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public Color LengthGreaterThanThreeColor
+        {
+            get
+            {
+                return _lengthGreaterThanThreeColor;
+            }
+            set
+            {
+                _lengthGreaterThanThreeColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public Color LengthLessThanThreeColor
+        {
+            get
+            {
+                return _lengthLessThanThreeColor;
+            }
+            set
+            {
+                _lengthLessThanThreeColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public Color AmendPriceColor
+        {
+            get
+            {
+                return _amendPriceColor;
+            }
+            set
+            {
+                _amendPriceColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public string AmendPriceNote
+        {
+            get
+            {
+                return _amendPriceNote;
+            }
+            set
+            {
+                _amendPriceNote = value;
+                NotifyPropertyChanged();
+            }
+        }
+        #endregion
         public AmendViewModel()
         {
             _service = new ShipmentService();
@@ -183,6 +291,7 @@ namespace legionexpress.ViewModels
 
             });
         }
+        #region Commands
         public ICommand ReprintLabelCommand => new Command(ReprintLabel);
         public ICommand ChangeNetworkCommand => new Command(ChangeNetwork);
         public ICommand HoldAndReleaseCommand => new Command(HoldandRelease);
@@ -191,9 +300,140 @@ namespace legionexpress.ViewModels
         public ICommand ClosePopupCommand => new Command(ClosePopup);
         public ICommand SubmitNoteCommand => new Command(SubmitNote);
         public ICommand AddWeightCommand => new Command(AddWeight);
+        public ICommand PriceAmendCommand => new Command(PriceAmend);
+        public ICommand PalletCommand => new Command(Pallet);
+        public ICommand Length1m3mCommand => new Command(Length1m3m);
+        public ICommand Length3mCommand => new Command(Length3m);
+        public ICommand ResidentialCommand => new Command(Residential);
+        public ICommand NonDataBagCommand => new Command(NonDataBag);
         public ICommand SubmitWeightCommand => new Command(SubmitWeight);
         public ICommand SubmitHoldReleaseNoteCommand => new Command(SubmitHoldReleaseNote);
+        public ICommand SubmitAmendPriceCommand => new Command(SubmitAmendPrice);
+        #endregion
+        #region Methods
+        private async void PriceAmend()
+        {
+            await PopupNavigation.Instance.PushAsync(new AmendPriceNote() { BindingContext = this });
+        }
+        private async void SubmitAmendPrice()
+        {
+            try
+            {
+                var shipmentID = Preferences.Get("ConsignmentKey", "default_value");
+                var amendPrice = new
+                {
+                    Id = shipmentID,
+                    Notes = AmendPriceNote
+                };
+                var result = await _service.AmendPrice(amendPrice);
+                if (result.hasError == false)
+                {
+                    await PopupNavigation.Instance.PopAsync();
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Price is Amend Successfully"));
+                    GetShipmentById();
+                }
+            }
+            catch (Exception)
+            {
 
+            }
+        }
+        private async void NonDataBag()
+        {
+            try
+            {
+                var shipmentID = Preferences.Get("ConsignmentKey", "default_value");
+                DimensionUpdateDto dimensionUpdateDto = new DimensionUpdateDto()
+                {
+                    Weight = 6,
+                    Height = 0,
+                    Length = 0,
+                    Width = 0,
+                    Id = shipmentID
+                };
+                var result = await _service.UpdateDimensions(dimensionUpdateDto);
+                if (result.hasError == false)
+                {
+
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Non Data Bag is Updated Successfully"));
+                    GetShipmentById();
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+        private async void Pallet()
+        {
+            try
+            {
+                var shipmentID = Preferences.Get("ConsignmentKey", "default_value");
+                var result = await _service.PalletRerquest(shipmentID);
+                if (result.hasError == false)
+                {
+
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Pallet is Updated Successfully"));
+                    GetShipmentById();
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+        private async void Length1m3m()
+        {
+            try
+            {
+                var shipmentID = Preferences.Get("ConsignmentKey", "default_value");
+                var result = await _service.Length1m3m(shipmentID);
+                if (result.hasError == false)
+                {
+
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Length is Requested Successfully"));
+                    GetShipmentById();
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+        private async void Length3m()
+        {
+            try
+            {
+                var shipmentID = Preferences.Get("ConsignmentKey", "default_value");
+                var result = await _service.Length3m(shipmentID);
+                if (result.hasError == false)
+                {
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Length is Requested Successfully"));
+                    GetShipmentById();
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+        private async void Residential()
+        {
+            try
+            {
+                var shipmentID = Preferences.Get("ConsignmentKey", "default_value");
+                var result = await _service.Residential(shipmentID);
+                if (result.hasError == false)
+                {
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Residential is Updated Successfully"));
+                    GetShipmentById();
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
         private async void AddWeight()
         {
             await PopupNavigation.Instance.PushAsync(new AddWeight() { BindingContext = this });
@@ -261,7 +501,7 @@ namespace legionexpress.ViewModels
 
                 if (string.IsNullOrEmpty(Notes))
                 {
-                    await Application.Current.MainPage.DisplayAlert("Alert", "Notes cannot be empty", "OK");
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Notes cannot be empty"));
                     IsRunning = false;
 
                 }
@@ -276,7 +516,7 @@ namespace legionexpress.ViewModels
                     var response = await _service.AddNote(obj);
                     if (response != null && response.hasError == false)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "Notes is Submitted Successfully", "OK");
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Notes is Submitted Successfully"));
                         PopupNavigation.Instance.PopAsync();
                     }
                 }
@@ -286,7 +526,6 @@ namespace legionexpress.ViewModels
             catch (Exception ex)
             {
                 IsRunning = false;
-
             }
         }
         private async void ChangeNetwork()
@@ -343,7 +582,7 @@ namespace legionexpress.ViewModels
                 var response = await _service.LabelReprint(shipmentID);
                 if (response.hasError == false)
                 {
-                    await Application.Current.MainPage.DisplayAlert("Alert", "Lebel is Reprinted", "OK");
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Lebel is Reprinted"));
                     GetShipmentById();
                 }
             }
@@ -381,7 +620,7 @@ namespace legionexpress.ViewModels
                 var result = await _service.GetShipmentById(shipmentId);
                 if (result != null && result.hasError == false)
                 {
-                    if(string.IsNullOrEmpty(result.result.notes))
+                    if (string.IsNullOrEmpty(result.result.notes))
                     {
                         Notes = result.result.deliveryInstruction;
                     }
@@ -391,7 +630,7 @@ namespace legionexpress.ViewModels
                     }
                     if (!string.IsNullOrEmpty(Notes))
                     {
-                        if(result.result.statusChangeRequest != null)
+                        if (result.result.statusChangeRequest != null)
                         {
                             string[] holdRelease = result.result.statusChangeRequest.Split('|');
                             if (holdRelease.Length > 1)
@@ -400,14 +639,23 @@ namespace legionexpress.ViewModels
                                 HoldReleaseNote = holdRelease[1];
                             }
                         }
-                       
+
                         if (!string.IsNullOrEmpty(result.result.notes))
                         {
+                            //if (result.result.notes.ToLower() == "pallet")
+                            //{
+                            //    PalletColor = Color.Orange;
+                            //}
+                            //else
+                            //{
+                            //    PalletColor = Color.LightGray;
+                            //}
                             AddNoteColor = Color.Orange;
                         }
                         else
                         {
                             AddNoteColor = Color.LightGray;
+                            // PalletColor = Color.LightGray;
                         }
                     }
 
@@ -447,18 +695,75 @@ namespace legionexpress.ViewModels
                         NetworkChangeColor = Color.Orange;
                     }
 
-                    var consignmmentItem = result.result.consignmentItems.Where(x => x.id == shipmentId).FirstOrDefault();
-                    if(consignmmentItem != null)
+                    if (result.result.palletRequest != null && (bool)result.result.palletRequest)
                     {
-                        if(consignmmentItem.changeRequestWeight == null)
+                        PalletColor = Color.Orange;
+                    }
+                    else
+                    {
+                        PalletColor = Color.LightGray;
+                    }
+
+                    if (result.result.residentialRequest != null && (bool)result.result.residentialRequest)
+                    {
+                        ResidentialColor = Color.Orange;
+                    }
+                    else
+                    {
+                        ResidentialColor = Color.LightGray;
+                    }
+
+                    if (result.result.lengthGreaterThanThreeRequest != null && (bool)result.result.lengthGreaterThanThreeRequest)
+                    {
+                        LengthGreaterThanThreeColor = Color.Orange;
+                    }
+                    else
+                    {
+                        LengthGreaterThanThreeColor = Color.LightGray;
+                    }
+
+                    if (result.result.lengthLessThanThreeRequest != null && (bool)result.result.lengthLessThanThreeRequest)
+                    {
+                        LengthLessThanThreeColor = Color.Orange;
+                    }
+                    else
+                    {
+                        LengthLessThanThreeColor = Color.LightGray;
+                    }
+                    if(result.result.priceAmendRequest != null && (bool)result.result.priceAmendRequest)
+                    {
+                        PriceAmendColor = Color.Orange;
+                    }
+                    else
+                    {
+                        PriceAmendColor = Color.LightGray;
+                    }
+                    if(!string.IsNullOrEmpty(result.result.notesPriceAmend))
+                    {
+                        AmendPriceNote = result.result.notesPriceAmend;
+                    }
+
+                    var consignmmentItem = result.result.consignmentItems.Where(x => x.id == shipmentId).FirstOrDefault();
+                    if (consignmmentItem != null)
+                    {
+                        if (consignmmentItem.changeRequestWeight == null)
                         {
                             AddWeightColor = Color.LightGray;
+                            NonDataBagColor = Color.LightGray;
                             Weight = consignmmentItem.changeRequestWeight.ToString();
                         }
                         else
                         {
                             AddWeightColor = Color.Orange;
                             Weight = consignmmentItem.changeRequestWeight.ToString();
+                            if (consignmmentItem.changeRequestWeight == 6)
+                            {
+                                NonDataBagColor = Color.Orange;
+                            }
+                            else
+                            {
+                                NonDataBagColor = Color.LightGray;
+                            }
 
                         }
                         if (consignmmentItem.changeRequestHeight == null && consignmmentItem.changeRequestWidth == null && consignmmentItem.changeRequestLength == null)
@@ -491,7 +796,7 @@ namespace legionexpress.ViewModels
 
                     //    //if (consignmmentItem.dimensionsChangeRequest.Contains("Weight= 0"))
                     //    //{
-                    //    //    AddWeightColor = Color.LightGray;
+                    //    //    AddWeightColor = Color.LightGrey;
                     //    //}
                     //    //else
                     //    //{
@@ -499,7 +804,7 @@ namespace legionexpress.ViewModels
                     //    //}
                     //    //if (consignmmentItem.dimensionsChangeRequest.Contains("Length= 0 Width= 0 Height= 0"))
                     //    //{
-                    //    //    VolumiseColor = Color.LightGray;
+                    //    //    VolumiseColor = Color.LightGrey;
                     //    //}
                     //    //else
                     //    //{
@@ -513,8 +818,8 @@ namespace legionexpress.ViewModels
                     //    width = consignmmentItem.width.ToString();
                     //    height = consignmmentItem.height.ToString();
 
-                    //    VolumiseColor = Color.LightGray;
-                    //    AddWeightColor = Color.LightGray;
+                    //    VolumiseColor = Color.LightGrey;
+                    //    AddWeightColor = Color.LightGrey;
                     //}
                 }
             }
@@ -523,5 +828,6 @@ namespace legionexpress.ViewModels
 
             }
         }
+        #endregion
     }
 }

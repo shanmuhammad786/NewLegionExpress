@@ -37,6 +37,13 @@ namespace legionexpress.Services
             string url = $"api/v1/shipment/update-shipment-notes";
             return await AddNote(obj, url);
         }
+        public async Task<ScanResponseModel> PalletRerquest( string shipmentId)
+        {
+            var shipObj = new ShipmentId();
+            shipObj.Id = shipmentId;
+            string url = $"api/v1/shipment/request-set-pallet";
+            return await PalletRequest(shipObj, url);
+        }
         public async Task<ScanResponseModel> ReleaseShipment(string notes,string shipmentId)
         {
             var shipObj = new ShipmentId();
@@ -55,7 +62,36 @@ namespace legionexpress.Services
 
             return await LabelReprint(shipObj, url);
         }
+        public async Task<ScanResponseModel> AmendPrice(object amendPrice)
+        {
+            string url = $"api/v1/shipment/request-price-amend";
 
+            return await AmendPrice(amendPrice, url);
+        }
+        public async Task<ScanResponseModel> Length1m3m(string shipmentId)
+        {
+            var shipObj = new ShipmentId();
+            shipObj.Id = shipmentId;
+            string url = $"api/v1/shipment/request-set-length-less-than-three";
+
+            return await Length1m3m(shipObj, url);
+        }
+        public async Task<ScanResponseModel> Length3m(string shipmentId)
+        {
+            var shipObj = new ShipmentId();
+            shipObj.Id = shipmentId;
+            string url = $"api/v1/shipment/request-set-length-greater-than-three";
+
+            return await Length3m(shipObj, url);
+        }
+        public async Task<ScanResponseModel> Residential (string shipmentId)
+        {
+            var shipObj = new ShipmentId();
+            shipObj.Id = shipmentId;
+            string url = $"api/v1/shipment/request-set-residential";
+
+            return await Residential(shipObj, url);
+        }
         public async Task UpdateNetwork(string shipmentId, int networkId)
         {
             var networkObj = new NetworkUpdateDto();
@@ -92,7 +128,16 @@ namespace legionexpress.Services
                 networkShipmentId = networkId
             };
             string url = $"api/v1/shipment/shipment-collection-scan";
-            return await PostShipmentCollectionScanned<ShipmentDetailsModel>(obj,url);
+            return await PostShipmentCollectionScanned<ShipmentDetailsModel>(obj,url, networkId, true);
+        }
+        public async Task<ShipmentDetailsModel> ShipmentWarehouseScanned(string networkId)
+        {
+            var obj = new
+            {
+                networkShipmentId = networkId
+            };
+            string url = $"api/v1/shipment/shipment-warehouse-scan";
+            return await PostShipmentCollectionScanned<ShipmentDetailsModel>(obj, url, networkId, false);
         }
     }
 }

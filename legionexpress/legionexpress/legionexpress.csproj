@@ -11,6 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.14" />
     <PackageReference Include="Scandit.DataCapture.Barcode.Xamarin.Forms" Version="6.9.2" />
@@ -26,6 +28,12 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Popups\AddWeight.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Popups\AlertPopup.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Popups\AmendPriceNote.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Popups\Instructions.xaml">
@@ -73,7 +81,7 @@
     <EmbeddedResource Update="Views\Hold.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\Home.xaml">
+    <EmbeddedResource Update="Views\CollectionHome.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\InfoScan.xaml">
@@ -100,7 +108,13 @@
     <EmbeddedResource Update="Views\ScanditExceptionScan.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Views\ScanditWarehouseScanning.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Views\ScanExemptionScreen.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\WarehouseHome.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\WeightDimensions.xaml">
@@ -121,6 +135,9 @@
     </Compile>
     <Compile Update="Popups\Volumise.xaml.cs">
       <DependentUpon>Volumise.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\CollectionHome.xaml.cs">
+      <DependentUpon>CollectionHome.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

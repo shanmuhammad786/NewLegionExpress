@@ -23,7 +23,7 @@ namespace legionexpress.Views
         }
         private async void Cancel_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new Home());
+            await Navigation.PushAsync(new CollectionHome());
         }
 
         private async void Exception_Clicked(object sender, EventArgs e)
@@ -31,7 +31,7 @@ namespace legionexpress.Views
             var hold = await Application.Current.MainPage.DisplayAlert("Exception Consignment!", "Are you sure Exception consignment", "yes", "no");
             if (hold)
             {
-                await Navigation.PushAsync(new Home());
+                await Navigation.PushAsync(new CollectionHome());
             }
         }
     }

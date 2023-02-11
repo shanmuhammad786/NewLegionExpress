@@ -31,7 +31,7 @@ namespace legionexpress.Views
 
         protected override bool OnBackButtonPressed()
         {
-            Application.Current.MainPage = new NavigationPage(new Home());
+            Application.Current.MainPage = new NavigationPage(new CollectionHome());
             return base.OnBackButtonPressed();
         }
         private async void Weight_Tapped(object sender, EventArgs e)

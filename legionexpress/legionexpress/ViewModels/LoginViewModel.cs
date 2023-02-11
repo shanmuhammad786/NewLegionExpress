@@ -1,6 +1,9 @@
-﻿using legionexpress.Models;
+﻿using legionexpress.Helpers;
+using legionexpress.Models;
+using legionexpress.Popups;
 using legionexpress.Services;
 using legionexpress.Views;
+using Rg.Plugins.Popup.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,6 +22,10 @@ namespace legionexpress.ViewModels
         public INavigation Navigation { get; set; }
         AuthService _service;
         private LoginModel _login;
+        private string _pin1;
+        private string _pin2;
+        private string _pin3;
+        private string _pin4;
         public LoginModel Login
         {
             get
@@ -44,6 +51,54 @@ namespace legionexpress.ViewModels
                 NotifyPropertyChanged();
             }
         }
+        public string Pin1
+        {
+            get
+            {
+                return _pin1;
+            }
+            set
+            {
+                _pin1 = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public string Pin2
+        {
+            get
+            {
+                return _pin2;
+            }
+            set
+            {
+                _pin2 = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public string Pin3
+        {
+            get
+            {
+                return _pin3;
+            }
+            set
+            {
+                _pin3 = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public string Pin4
+        {
+            get
+            {
+                return _pin4;
+            }
+            set
+            {
+                _pin4 = value;
+                NotifyPropertyChanged();
+            }
+        }
         #endregion
         public LoginViewModel(INavigation navigation)
         {
@@ -55,16 +110,27 @@ namespace legionexpress.ViewModels
         private async Task LoginCommandAsync()
         {
             this.IsRunning = true;
-            var authentication = await _service.GenerateToken(Login);
-            if (authentication.hasError == false)
+            Utilty.username = Login.UserID;
+            Login.Pin = Pin1 + Pin2 + Pin3 + Pin4;
+            Preferences.Set("Username", Login.UserID);
+            if (Login != null && !string.IsNullOrEmpty(Login.UserID) && !string.IsNullOrEmpty(Login.Pin))
             {
-                Preferences.Set("token", authentication.result.apiKey);
-                Application.Current.MainPage = new NavigationPage(new Home());
+                var authentication = await _service.GenerateToken(Login);
+                if (authentication.hasError == false)
+                {
+                    Preferences.Set("token", authentication.result.apiKey);
+                    Application.Current.MainPage = new NavigationPage(new CollectionHome());
+                }
+                else
+                {
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Invalid UserID Or Pin Number"));
+                }
             }
             else
             {
-               await Application.Current.MainPage.DisplayAlert("Error", "Invalid UserID Or Pin Number", "Ok");
+                await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "All Fields are Required."));
             }
+
             this.IsRunning = false;
         }
     }

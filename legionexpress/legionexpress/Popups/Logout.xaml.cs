@@ -1,4 +1,5 @@
-﻿using legionexpress.Views;
+﻿using legionexpress.ViewModels;
+using legionexpress.Views;
 using Rg.Plugins.Popup.Pages;
 using Rg.Plugins.Popup.Services;
 using System;
@@ -14,7 +15,8 @@ namespace legionexpress.Popups
 		public Logout ()
 		{
 			InitializeComponent ();
-		}
+            BindingContext = new LogoutViewModel();
+        }
 
         private void Cancel_Clicked(object sender, EventArgs e)
         {

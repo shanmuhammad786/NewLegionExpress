@@ -10,6 +10,7 @@ namespace legionexpress.Helpers
     {
         public static string HoldandReleaseKey = "Hold";
         public static int count = 0;
+        public static string username = string.Empty;
 
         public static async Task SetSecureStorageValue(string key, string value)
         {

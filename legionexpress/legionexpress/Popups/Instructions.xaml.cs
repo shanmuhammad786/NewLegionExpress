@@ -9,7 +9,7 @@ namespace legionexpress.Popups
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class Instructions : PopupPage
     {
-        public Instructions(string lengthAlert, string instructions, string localPostalCode)
+        public Instructions(string lengthAlert, string instructions, string localPostalCode,string worldOptionCode)
         {
             InitializeComponent();
             if(!string.IsNullOrEmpty(lengthAlert))
@@ -38,8 +38,16 @@ namespace legionexpress.Popups
             {
                 PostalCode.IsVisible = false;
             }
+            if (!string.IsNullOrEmpty(worldOptionCode))
+            {
+                WorldOptionCodeText.Text = worldOptionCode;
+            }
+            else
+            {
+                WorldOptionCode.IsVisible = false;
+            }
 
-          
+
         }
         protected override void OnAppearing()
         {

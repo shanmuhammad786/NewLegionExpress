@@ -1,6 +1,12 @@
 ﻿using legionexpress.Constants;
+using legionexpress.Helpers;
 using legionexpress.Models;
+using legionexpress.Popups;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Newtonsoft.Json;
+using Rg.Plugins.Popup.Services;
+using Scandit.DataCapture.Barcode.Data.Unified;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -74,7 +80,7 @@ namespace legionexpress.Services
                     var data = JsonConvert.DeserializeObject<T>(response);
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "Something went wrong please try again", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
                         return data;
                     }
                     return data;
@@ -83,10 +89,10 @@ namespace legionexpress.Services
                 {
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     throw exp;
                 }
             }
@@ -113,7 +119,7 @@ namespace legionexpress.Services
                     var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "Something went wrong please try again", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
                         return data;
                     }
                     return data;
@@ -122,10 +128,49 @@ namespace legionexpress.Services
                 {
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
+                    throw exp;
+                }
+            }
+        }
+        protected async Task<ScanResponseModel> PalletRequest(Object obj, string url)
+        {
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
+
+            using (var httpClient = new HttpClient())
+            {
+
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage();
+                    request.RequestUri = new Uri(AppConstants.BaseUrl + url);
+                    var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                    request.Content = content;
+                    request.Method = HttpMethod.Post;
+                    var token = Preferences.Get("token", "default_value");
+                    request.Headers.Add("X-ApiKey", token);
+                    responseMessage = await httpClient.SendAsync(request);
+                    var response = await responseMessage.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
+                    if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
+                        return data;
+                    }
+                    return data;
+                }
+                catch (Exception exp)
+                {
+                    if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
+                    }
+                    else
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     throw exp;
                 }
             }
@@ -152,7 +197,7 @@ namespace legionexpress.Services
                     var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "Something went wrong please try again", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
                         return data;
                     }
                     return data;
@@ -161,10 +206,10 @@ namespace legionexpress.Services
                 {
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     throw exp;
                 }
             }
@@ -192,7 +237,7 @@ namespace legionexpress.Services
                     var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "Something went wrong please try again", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
                         return data;
                     }
                     return data;
@@ -201,10 +246,10 @@ namespace legionexpress.Services
                 {
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     throw exp;
                 }
             }
@@ -237,10 +282,10 @@ namespace legionexpress.Services
                 {
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     throw exp;
                 }
             }
@@ -268,7 +313,7 @@ namespace legionexpress.Services
                     var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "Something went wrong please try again", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
                         return data;
                     }
                     return data;
@@ -277,10 +322,10 @@ namespace legionexpress.Services
                 {
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     throw exp;
                 }
             }
@@ -306,7 +351,7 @@ namespace legionexpress.Services
                     var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "Something went wrong please try again", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
                         return data;
                     }
                     return data;
@@ -315,10 +360,10 @@ namespace legionexpress.Services
                 {
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     throw exp;
                 }
             }
@@ -345,7 +390,7 @@ namespace legionexpress.Services
                     var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "Something went wrong please try again", "Ok");
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
                         return data;
                     }
                     return data;
@@ -354,15 +399,170 @@ namespace legionexpress.Services
                 {
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     throw exp;
                 }
             }
         }
+        protected async Task<ScanResponseModel> AmendPrice(Object obj, string url)
+        {
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
 
+            using (var httpClient = new HttpClient())
+            {
+
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage();
+                    request.RequestUri = new Uri(AppConstants.BaseUrl + url);
+                    var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                    request.Content = content;
+                    request.Method = HttpMethod.Post;
+                    var token = Preferences.Get("token", "default_value");
+                    request.Headers.Add("X-ApiKey", token);
+                    responseMessage = await httpClient.SendAsync(request);
+                    var response = await responseMessage.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
+                    if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
+                        return data;
+                    }
+                    return data;
+                }
+                catch (Exception exp)
+                {
+                    if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
+                    }
+                    else
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
+                    throw exp;
+                }
+            }
+        }
+        protected async Task<ScanResponseModel> Length1m3m(Object obj, string url)
+        {
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
+
+            using (var httpClient = new HttpClient())
+            {
+
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage();
+                    request.RequestUri = new Uri(AppConstants.BaseUrl + url);
+                    var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                    request.Content = content;
+                    request.Method = HttpMethod.Post;
+                    var token = Preferences.Get("token", "default_value");
+                    request.Headers.Add("X-ApiKey", token);
+                    responseMessage = await httpClient.SendAsync(request);
+                    var response = await responseMessage.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
+                    if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
+                        return data;
+                    }
+                    return data;
+                }
+                catch (Exception exp)
+                {
+                    if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
+                    }
+                    else
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
+                    throw exp;
+                }
+            }
+        }
+        protected async Task<ScanResponseModel> Length3m(Object obj, string url)
+        {
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
+
+            using (var httpClient = new HttpClient())
+            {
+
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage();
+                    request.RequestUri = new Uri(AppConstants.BaseUrl + url);
+                    var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                    request.Content = content;
+                    request.Method = HttpMethod.Post;
+                    var token = Preferences.Get("token", "default_value");
+                    request.Headers.Add("X-ApiKey", token);
+                    responseMessage = await httpClient.SendAsync(request);
+                    var response = await responseMessage.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
+                    if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
+                        return data;
+                    }
+                    return data;
+                }
+                catch (Exception exp)
+                {
+                    if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
+                    }
+                    else
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
+                    throw exp;
+                }
+            }
+        }
+        protected async Task<ScanResponseModel> Residential(Object obj, string url)
+        {
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
+
+            using (var httpClient = new HttpClient())
+            {
+
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage();
+                    request.RequestUri = new Uri(AppConstants.BaseUrl + url);
+                    var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                    request.Content = content;
+                    request.Method = HttpMethod.Post;
+                    var token = Preferences.Get("token", "default_value");
+                    request.Headers.Add("X-ApiKey", token);
+                    responseMessage = await httpClient.SendAsync(request);
+                    var response = await responseMessage.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<ScanResponseModel>(response);
+                    if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
+                        return data;
+                    }
+                    return data;
+                }
+                catch (Exception exp)
+                {
+                    if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
+                    }
+                    else
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
+                    throw exp;
+                }
+            }
+        }
         protected async Task<T> GetAuthorized<T>(string url)
         {
             HttpResponseMessage responseMessage = new HttpResponseMessage();
@@ -400,17 +600,19 @@ namespace legionexpress.Services
                 {
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     return default(T);
                 }
             }
         }
 
-        protected async Task<ShipmentDetailsModel> PostShipmentCollectionScanned<T>(Object obj, string url)
+        protected async Task<ShipmentDetailsModel> PostShipmentCollectionScanned<T>(Object obj, string url, string barcode, bool isCollection)
         {
+            var username = Preferences.Get("Username", "default_value");
+
             HttpResponseMessage responseMessage = new HttpResponseMessage();
             var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
 
@@ -430,19 +632,41 @@ namespace legionexpress.Services
                     var data = JsonConvert.DeserializeObject<ShipmentDetailsModel>(response);
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert",data.errorMessage , "Ok");
+                        Dictionary<string, string> scanNOtOKProperties = new Dictionary<string, string>();
+                        scanNOtOKProperties.Add("DateTime", DateTime.UtcNow.ToString());
+                        scanNOtOKProperties.Add("Barcode", barcode);
+                        scanNOtOKProperties.Add("Username", username);
+                        Analytics.TrackEvent("Scanning is not OK", scanNOtOKProperties);
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error",data.errorMessage));
                         return data;
+                    }
+                    Dictionary<string, string> scanOKProperties = new Dictionary<string, string>();
+                    scanOKProperties.Add("DateTime", DateTime.UtcNow.ToString());
+                    scanOKProperties.Add("Barcode", barcode);
+                    scanOKProperties.Add("Username", username);
+                    if(isCollection)
+                    {
+                        Analytics.TrackEvent("Collection Scanning Api is OK", scanOKProperties);
+                    }
+                    else
+                    {
+                        Analytics.TrackEvent("Warehouse Scanning Api is OK", scanOKProperties);
                     }
                     return data;
                 }
                 catch (Exception exp)
                 {
+                    Dictionary<string, string> scanStartProperties = new Dictionary<string, string>();
+                    scanStartProperties.Add("DateTime", DateTime.UtcNow.ToString());
+                    scanStartProperties.Add("Barcode", barcode);
+                    scanStartProperties.Add("Username", username);
+                    Crashes.TrackError(exp, scanStartProperties);
                     if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Alert", "You do not have access to this resource. Invalid API Key!", "Ok");
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
                     }
                     else
-                        await Application.Current.MainPage.DisplayAlert("Alert", exp.ToString(), "Ok");
+                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
                     throw exp;
                 }
             }

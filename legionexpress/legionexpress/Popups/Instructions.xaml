@@ -35,7 +35,11 @@
                             <Label Text="Local Delivery Alert" FontSize="38" HorizontalOptions="CenterAndExpand" TextColor="White"/>
                             <Label x:Name="PostalCodeText" HorizontalOptions="CenterAndExpand" TextColor="White" FontSize="18"/>
                         </StackLayout>
-                </StackLayout>
+                        <StackLayout x:Name="WorldOptionCode" HorizontalOptions="CenterAndExpand">
+                            <Label Text="World Options Alert" FontSize="38" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+                            <Label x:Name="WorldOptionCodeText" HorizontalOptions="CenterAndExpand" TextColor="White" FontSize="18"/>
+                        </StackLayout>
+                    </StackLayout>
                 <StackLayout Margin="0,30,0,10">
                     <Button Text="OK" Command="{Binding InstructionsCloseCommand}" CornerRadius="10" BackgroundColor="White" TextColor="Black"/>
                 </StackLayout>

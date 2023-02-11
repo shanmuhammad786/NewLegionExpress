@@ -19,27 +19,50 @@
         BackgroundColor="Transparent"
         HorizontalOptions="FillAndExpand" 
        >
-        <Frame CornerRadius="20"  HorizontalOptions="FillAndExpand" BackgroundColor=" #000000 " HeightRequest="350" >
+        <Frame CornerRadius="20"  HorizontalOptions="FillAndExpand" BackgroundColor=" #000000 " HeightRequest="550" >
             <StackLayout>
                 <BoxView HeightRequest="1" BackgroundColor="White" Margin="80,0"/>
                 <Label HorizontalTextAlignment="Center" Text="Amend Options" TextColor="White" FontSize="20"></Label>
-                <Button CornerRadius="10"  Text="Add Note" Command="{Binding AddNoteCommand}" BackgroundColor="{Binding AddNoteColor}" ></Button>
-                <Button CornerRadius="10"  Text="Network Change" Command="{Binding ChangeNetworkCommand}" BackgroundColor="{Binding NetworkChangeColor}"></Button>
-                <Button CornerRadius="10"  Text="Add Weight" Command="{Binding AddWeightCommand}" BackgroundColor="{Binding AddWeightColor}" ></Button>
-                <Button CornerRadius="10"  Text="Volumise" Command="{Binding VolumiseCommand}" BackgroundColor="{Binding VolumiseColor}" ></Button>
-                <Button CornerRadius="10" Text="Reprint Lable" Command="{Binding ReprintLabelCommand}" BackgroundColor="{Binding ReprintLabelColor}"></Button>
-                <Button CornerRadius="10" Text="{Binding BtnText}"  Command="{Binding HoldAndReleaseCommand}" BackgroundColor="{Binding HoldColor}"></Button>
-                <StackLayout>
-                    <StackLayout.GestureRecognizers>
+                <StackLayout HorizontalOptions="CenterAndExpand" Spacing="20">
+                <StackLayout Orientation="Horizontal" Spacing="20">
+                    <Button CornerRadius="10" HorizontalOptions="Start"  Text="Non Data Bag" Command="{Binding NonDataBagCommand}" BackgroundColor="{Binding NonDataBagColor}" WidthRequest="150" ></Button>
+                    <Button CornerRadius="10" HorizontalOptions="End"  Text="Network Change" Command="{Binding ChangeNetworkCommand}" BackgroundColor="{Binding NetworkChangeColor}" WidthRequest="150"></Button>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" Spacing="20">
+                    <Button CornerRadius="10" Text="Reprint Lable" Command="{Binding ReprintLabelCommand}" BackgroundColor="{Binding ReprintLabelColor}" WidthRequest="150"></Button>
+                    <Button CornerRadius="10"  Text="Price Amend" Command="{Binding PriceAmendCommand}" BackgroundColor="{Binding PriceAmendColor}" WidthRequest="150" ></Button>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" Spacing="20">
+                    <Button CornerRadius="10"  Text="Add Weight" Command="{Binding AddWeightCommand}" BackgroundColor="{Binding AddWeightColor}" WidthRequest="150" ></Button>
+                    <Button CornerRadius="10" Text="Volumise"  Command="{Binding VolumiseCommand}"  BackgroundColor="{Binding VolumiseColor}" WidthRequest="150"></Button>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" Spacing="20">
+                        <Button CornerRadius="10"  Text="Pallet" Command="{Binding PalletCommand}" BackgroundColor="{Binding PalletColor}" WidthRequest="150"  ></Button>
+                    <Button CornerRadius="10" Text="Add Note"  Command="{Binding AddNoteCommand}" BackgroundColor="{Binding  AddNoteColor}" WidthRequest="150" ></Button>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" Spacing="20">
+                        <Button CornerRadius="10"  Text="Length 1.4m-3m" Command="{Binding Length1m3mCommand}" BackgroundColor="{Binding LengthLessThanThreeColor}" WidthRequest="150"  ></Button>
+                        <Button CornerRadius="10" Text="Length 3m+"  Command="{Binding Length3mCommand}" BackgroundColor="{Binding LengthGreaterThanThreeColor}" WidthRequest="150" ></Button>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" Spacing="20">
+                        <Button CornerRadius="10"  Text="Residential" Command="{Binding ResidentialCommand}" BackgroundColor="{Binding ResidentialColor}" WidthRequest="150"  ></Button>
+                    <Button CornerRadius="10" Text="{Binding BtnText}"  Command="{Binding HoldAndReleaseCommand}" BackgroundColor="{Binding HoldColor}" WidthRequest="150" ></Button>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" Spacing="20">
+                    <Button CornerRadius="10"  Text="18+"  BackgroundColor="White" TextColor="Black" WidthRequest="150" ></Button>
+                    <Button CornerRadius="10"    BackgroundColor="White" WidthRequest="150" ></Button>
+                </StackLayout>
+                <StackLayout HorizontalOptions="CenterAndExpand" WidthRequest="150">
+                    <Button Text="Cancel" TextColor="Black" BackgroundColor="White" Clicked="OnCancel_Clicked" CornerRadius="10"/>
+                    <!--<StackLayout.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnCancel_Clicked" />
                     </StackLayout.GestureRecognizers>
                     <Image Source="back" HeightRequest="40" Margin="20,0">
-                        
-                    </Image>
+                    </Image>-->
                 </StackLayout>
-                
             </StackLayout>
-        </Frame>
+            </StackLayout>
 
+        </Frame>
     </StackLayout>
 </rg:PopupPage>

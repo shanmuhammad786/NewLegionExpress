@@ -1,5 +1,8 @@
 ﻿using legionexpress.Services;
 using legionexpress.Views;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using System;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -22,9 +25,14 @@ namespace legionexpress
             //InitSettings();
             InitializeComponent();
             var token = Preferences.Get("token", "default_value");
-            if(token != "default_value")
+            AppCenter.Start("android=03f16b55-8b3f-43a6-a1e8-c9c33eca3536;" +
+                   "uwp=03f16b55-8b3f-43a6-a1e8-c9c33eca3536;" +
+                   "ios=03f16b55-8b3f-43a6-a1e8-c9c33eca3536;" +
+                   "macos=03f16b55-8b3f-43a6-a1e8-c9c33eca3536;",
+                   typeof(Analytics), typeof(Crashes));
+            if (token != "default_value")
             {
-                MainPage = new NavigationPage(new Home());
+                MainPage = new NavigationPage(new CollectionHome());
             }
             else
             {

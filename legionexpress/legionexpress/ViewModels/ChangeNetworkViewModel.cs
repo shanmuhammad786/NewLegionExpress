@@ -1,4 +1,5 @@
 ﻿using legionexpress.Models;
+using legionexpress.Popups;
 using legionexpress.Services;
 using Rg.Plugins.Popup.Services;
 using System;
@@ -71,8 +72,9 @@ namespace legionexpress.ViewModels
                 var response = await _service.ChangeNetworks(networkObj);
                 if (response.hasError == false)
                 {
-                    await Application.Current.MainPage.DisplayAlert("Alert", "Network is Updated", "OK");
+
                     await PopupNavigation.Instance.PopAsync();
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Network is Updated"));
                 }
             }
             catch (Exception ex)

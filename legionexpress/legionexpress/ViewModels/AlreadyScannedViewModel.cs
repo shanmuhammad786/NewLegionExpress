@@ -23,17 +23,57 @@ namespace legionexpress.ViewModels
         private string _volumiseText;
         private string _collectionPostCode;
         private string _parcelNumber;
+        private string _deliveryAddress;
+        private string _consignmentNumber;
+        private string _weight;
         private bool _notesVisibility;
         private bool _networkVisibility;
         private bool _weightVisibility;
         private bool _volumiseVisibility;
         private bool _labelReprintedVisibility;
         private bool _amendmentVisibility;
+        private bool _amendParcelBtnVisibility;
         string _length = string.Empty;
         string _width = string.Empty;
         string _height = string.Empty;
         #endregion
         #region PublicProperties
+        public string DeliveryAddress
+        {
+            get
+            {
+                return _deliveryAddress;
+            }
+            set
+            {
+                _deliveryAddress = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public string ConsignmentNumber
+        {
+            get
+            {
+                return _consignmentNumber;
+            }
+            set
+            {
+                _consignmentNumber = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public string Weight
+        {
+            get
+            {
+                return _weight;
+            }
+            set
+            {
+                _weight = value;
+                NotifyPropertyChanged();
+            }
+        }
         public string NoteText
         {
             get
@@ -179,10 +219,28 @@ namespace legionexpress.ViewModels
                 NotifyPropertyChanged();
             }
         }
+        public bool AmendParcelBtnVisibility
+        {
+            get
+            {
+                return _amendParcelBtnVisibility;
+            }
+            set
+            {
+                _amendParcelBtnVisibility = value;
+                NotifyPropertyChanged();
+            }
+        }
         #endregion
         public AlreadyScannedViewModel(ShipmentResult shipmentResult)
         {
             _service = new ShipmentService();
+            var navigationList = Application.Current.MainPage.Navigation.NavigationStack.ToList();
+            var isCollectionSan = navigationList.Any(x => x.GetType().Name == "ScanditCollectionScanning");
+            if(!isCollectionSan)
+            {
+                AmendParcelBtnVisibility = true;
+            }
             GetShipmentById(shipmentResult);
         }
         #region Commands
@@ -271,7 +329,14 @@ namespace legionexpress.ViewModels
                     {
                         AmendmentVisibility = true;
                     }
-
+                DeliveryAddress = shipmentResult.deliveryAddress1 + " " + shipmentResult.deliveryAddress2 + "" + shipmentResult.deliveryAddress3
+                + " " + shipmentResult.deliveryAddress4;
+                if(shipmentResult.weight != null)
+                {
+                    Weight = shipmentResult.weight.ToString();
+                }
+                ConsignmentNumber =  shipmentResult.noteNumber;
+                
             }
             catch (Exception ex)
             {

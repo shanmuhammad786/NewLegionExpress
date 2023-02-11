@@ -22,12 +22,12 @@ using Scandit.DataCapture.Core.UI.Unified;
 using legionexpress.Helpers;
 using System.Collections.Generic;
 using System.Threading;
-using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
+using Microsoft.AppCenter.Analytics;
 
 namespace legionexpress.ViewModels
 {
-    public class ScanditCollectionScanningViewModel :BaseViewModel, INotifyPropertyChanged, IBarcodeCaptureListener
+    public class ScanditWarehouseScanningViewModel :BaseViewModel, INotifyPropertyChanged, IBarcodeCaptureListener
     {
         #region PrivateProperties
         private static readonly ScannerModel settings = ScannerModel.Instance;
@@ -36,7 +36,7 @@ namespace legionexpress.ViewModels
         ShipmentService _service;
         private bool _isLoading;
         private bool _amendmendVisibility;
-        private string _collectionScannedCount;
+        private string _warehouseScannedCount;
         #endregion
         #region PublicProperties
         public bool AmendmendVisibility
@@ -51,20 +51,20 @@ namespace legionexpress.ViewModels
                 NotifyPropertyChanged();
             }
         }
-        public string CollectionScannedCount
+        public string WarehouseScannedCount
         {
             get
             {
-                return _collectionScannedCount;
+                return _warehouseScannedCount;
             }
             set
             {
-                _collectionScannedCount = value;
-                // NotifyPropertyChanged();
-                OnPropertyChanged("CollectionScannedCount");
+                _warehouseScannedCount = value;
+                OnPropertyChanged("WarehouseScannedCount");
             }
         }
         #endregion
+
         public Camera Camera { get; private set; } = ScannerModel.Instance.CurrentCamera;
 
         public BarcodeCaptureSettings BarcodeCaptureSettings { get; private set; } = ScannerModel.Instance.BarcodeCaptureSettings;
@@ -128,11 +128,11 @@ namespace legionexpress.ViewModels
         }
 
         public INavigation Navigation { get; set; }
-        public ScanditCollectionScanningViewModel(INavigation navigation)
+        public ScanditWarehouseScanningViewModel(INavigation navigation)
         {
             this.Navigation = navigation;
             _service = new ShipmentService();
-            AmendmendVisibility = false;
+            AmendmendVisibility = true;
             GetScannedCount();
             this.InitializeScanner();
         }
@@ -141,13 +141,12 @@ namespace legionexpress.ViewModels
         public ICommand InstructionsCloseCommand => new Command(InstructionsClose);
         public ICommand StopScanningCommand => new Command(StopScanning);
         #endregion
-
         private async void GetScannedCount()
         {
-            var count = Preferences.Get("CollectionScannedCount", "0");
-            if(count != null)
+            var count = Preferences.Get("WarehouseScannedCount", "0");
+            if (count != null)
             {
-                CollectionScannedCount = count;
+                WarehouseScannedCount = count;
             }
 
         }
@@ -162,7 +161,7 @@ namespace legionexpress.ViewModels
         private void InstructionsClose()
         {
             PopupNavigation.Instance.PopAsync();
-         
+
         }
         private void StopScanning()
         {
@@ -308,17 +307,17 @@ namespace legionexpress.ViewModels
                 scanStartProperties.Add("Barcode", barCode);
                 scanStartProperties.Add("Username", username);
 
-                Analytics.TrackEvent("Collection Scanning is started", scanStartProperties);
+                Analytics.TrackEvent("Warehouse Scanning is started", scanStartProperties);
                 IsLoading = true;
-                var shipment = await _service.ShipmentCollectionScanned(barCode);
+                var shipment = await _service.ShipmentWarehouseScanned(barCode);
                 await Task.Delay(500);
                 if (shipment != null && shipment.hasError == false)
                 {
-                    var count = Preferences.Get("CollectionScannedCount", "0");
+                    var count = Preferences.Get("WarehouseScannedCount", "0");
                     var newCount = Convert.ToInt32(count);
                     newCount = newCount + 1;
-                    Preferences.Set("CollectionScannedCount", newCount.ToString());
-                    CollectionScannedCount = newCount.ToString();
+                    Preferences.Set("WarehouseScannedCount", newCount.ToString());
+                    WarehouseScannedCount = newCount.ToString();
                     if (shipment.result != null)
                     {
                         string lengthAlert = string.Empty;
@@ -333,13 +332,13 @@ namespace legionexpress.ViewModels
                         }
                         string localPostalCode = string.Empty;
                         var isLocalPost = await isLocalPostalAlert(shipment.result.deliveryPostcode);
-                        if(isLocalPost)
+                        if (isLocalPost)
                         {
                             localPostalCode = $"Local Delivery Alert: {shipment.result.deliveryPostcode}";
                         }
                         string worldOptionCode = string.Empty;
                         var isWorldOptions = await isWorldOptionsAlert(shipment.result.deliveryPostcode);
-                        if(isWorldOptions)
+                        if (isWorldOptions)
                         {
                             worldOptionCode = $"World Options Alert: {shipment.result.deliveryPostcode}";
                         }
@@ -355,7 +354,7 @@ namespace legionexpress.ViewModels
                         }
                         else
                         {
-                            if (shipment.result.declaredLengthCount > 0 || !string.IsNullOrEmpty(instructions) || !string.IsNullOrEmpty(localPostalCode) || !string.IsNullOrEmpty(worldOptionCode))
+                            if (shipment.result.declaredLengthCount > 0 || !string.IsNullOrEmpty(instructions) || !string.IsNullOrEmpty(localPostalCode))
                             {
                                 IsLoading = false;
                                 await PopupNavigation.Instance.PushAsync(new Instructions(lengthAlert, instructions, localPostalCode, worldOptionCode) { BindingContext = this });
@@ -374,7 +373,6 @@ namespace legionexpress.ViewModels
                     IsLoading = false;
                     MessagingCenter.Send<string>("1", "EnableScan");
                 }
-
                 //if (shipment != null && shipment.hasError == false)
                 //{
                 //    Preferences.Set("ConsignmentKey", shipment.result.ToString());
@@ -412,12 +410,12 @@ namespace legionexpress.ViewModels
                 //    }
 
                 //}
-
                 Dictionary<string, string> scanEndProperties = new Dictionary<string, string>();
                 scanEndProperties.Add("DateTime", DateTime.UtcNow.ToString());
                 scanEndProperties.Add("Barcode", barCode);
                 scanEndProperties.Add("Username", username);
-                Analytics.TrackEvent("Collection Scanning is ended", scanEndProperties);
+                Analytics.TrackEvent("Warehouse Scanning is ended", scanEndProperties);
+
             }
             catch (Exception ex)
             {
@@ -426,7 +424,6 @@ namespace legionexpress.ViewModels
                 scanStartProperties.Add("Barcode", barCode);
                 scanStartProperties.Add("Username", username);
                 Crashes.TrackError(ex, scanStartProperties);
-
                 MessagingCenter.Send<string>("1", "EnableScan");
                 IsLoading = false;
             }
@@ -467,7 +464,7 @@ namespace legionexpress.ViewModels
             localPostalCodeList.Add("S65");
             foreach (var item in localPostalCodeList)
             {
-                if(pC.Contains(" "))
+                if (pC.Contains(" "))
                 {
                     string[] str = pC.Split(' ');
                     if (str[0] == item)
@@ -534,6 +531,7 @@ namespace legionexpress.ViewModels
             }
             return false;
         }
+
         //public async Task LoadData(string shipmentId)
         //{
         //    //this.IsRunning = true;
@@ -613,3 +611,4 @@ namespace legionexpress.ViewModels
         }
     }
 }
+

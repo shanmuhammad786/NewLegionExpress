@@ -13,14 +13,14 @@ using Xamarin.Forms.Xaml;
 namespace legionexpress.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class ScanditCollectionScanning : ContentPage
+    public partial class ScanditWarehouseScanning : ContentPage
     {
-        ScanditCollectionScanningViewModel viewModel;
+        ScanditWarehouseScanningViewModel viewModel;
 
-        public ScanditCollectionScanning()
+        public ScanditWarehouseScanning()
         {
             InitializeComponent();
-            viewModel = new ScanditCollectionScanningViewModel(Navigation);
+            viewModel = new ScanditWarehouseScanningViewModel(Navigation);
             BindingContext = viewModel;
         }
         protected override void OnAppearing()
@@ -38,7 +38,6 @@ namespace legionexpress.Views
 
         private async void OnCancel_Clicked(object sender, EventArgs e)
         {
-            //await Navigation.PushAsync(new CollectionHome());
             await Navigation.PopAsync();
         }
         private async void onAmendClicked(object sender, EventArgs e)

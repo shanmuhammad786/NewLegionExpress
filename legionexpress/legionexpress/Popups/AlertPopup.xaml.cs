@@ -1,4 +1,5 @@
 ﻿using Rg.Plugins.Popup.Pages;
+using Rg.Plugins.Popup.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,21 +12,18 @@ using Xamarin.Forms.Xaml;
 namespace legionexpress.Popups
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class AddNote : PopupPage
+    public partial class AlertPopup : PopupPage
     {
-        public AddNote()
+        public AlertPopup(string alert, string description)
         {
             InitializeComponent();
+            Alert.Text = alert;
+            Description.Text = description;
         }
-        protected override void OnAppearing()
+
+        private void Button_Clicked(object sender, EventArgs e)
         {
-            base.OnAppearing();
-            NoteEntry.Focus();
-        }
-        protected override void OnDisappearing()
-        {
-            base.OnDisappearing();
-            MessagingCenter.Send<string>("1", "LoadShipmentData");
+            PopupNavigation.Instance.PopAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using legionexpress.Services;
+﻿using legionexpress.Popups;
+using legionexpress.Services;
 using Rg.Plugins.Popup.Services;
 using System;
 using System.Collections.Generic;
@@ -101,40 +102,54 @@ namespace legionexpress.ViewModels
             _service = new ShipmentService();
             GetShipmentById();
         }
+        #region Commands
         public ICommand DimentionsCommand => new Command(Dimentions);
+        public ICommand PopupCloseCommand => new Command(PopupClose);
+        #endregion
+        #region Methods
+        private async void PopupClose()
+        {
+            await PopupNavigation.Instance.PopAsync();
+        }
         private async void Dimentions()
         {
             try
             {
-                var obj = new DimensionUpdateDto();
-                var shipmentID = Preferences.Get("ConsignmentKey", "default_value");
-                obj.Id = shipmentID;
-                if (string.IsNullOrEmpty(Length))
+                if(!string.IsNullOrEmpty(Length) && !string.IsNullOrEmpty(Width) && !string.IsNullOrEmpty(Height))
                 {
-                    Length = "0";
+                    var obj = new DimensionUpdateDto();
+                    var shipmentID = Preferences.Get("ConsignmentKey", "default_value");
+                    obj.Id = shipmentID;
+                    if (string.IsNullOrEmpty(Length))
+                    {
+                        Length = "0";
+                    }
+                    if (string.IsNullOrEmpty(Width))
+                    {
+                        Width = "0";
+                    }
+                    if (string.IsNullOrEmpty(Height))
+                    {
+                        Height = "0";
+                    }
+                    obj.Length = double.Parse(Length);
+                    obj.Width = double.Parse(Width);
+                    obj.Height = double.Parse(Height);
+                    if (!string.IsNullOrEmpty(Weight.ToString()))
+                    {
+                        obj.Weight = double.Parse(Weight);
+                    }
+                    var response = await _service.UpdateDimensions(obj);
+                    if (response.hasError == false)
+                    {
+                        await PopupNavigation.Instance.PopAsync();
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Dimentions are Updated Successfully"));
+                    }
                 }
-                if (string.IsNullOrEmpty(Width))
+                else
                 {
-                    Width = "0";
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "All Fields are Required."));
                 }
-                if (string.IsNullOrEmpty(Height))
-                {
-                    Height = "0";
-                }
-                obj.Length = double.Parse(Length);
-                obj.Width = double.Parse(Width);
-                obj.Height = double.Parse(Height);
-                if (!string.IsNullOrEmpty(Weight.ToString()))
-                {
-                    obj.Weight = double.Parse(Weight);
-                }
-                var response = await _service.UpdateDimensions(obj);
-                if (response.hasError == false)
-                {
-                    await Application.Current.MainPage.DisplayAlert("Alert", "Dimentions are Updated Successfully", "OK");
-                    await PopupNavigation.Instance.PopAsync();
-                }
-
             }
             catch (Exception ex)
             {
@@ -216,5 +231,6 @@ namespace legionexpress.ViewModels
 
             }
         }
+        #endregion
     }
 }

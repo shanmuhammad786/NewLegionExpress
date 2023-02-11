@@ -34,6 +34,7 @@ namespace legionexpress.Models
         public string trackingDay { get; set; }
         public string trackingTime { get; set; }
         public string trackingDateFormatted { get; set; }
+      
     }
 
     public class ConsignmentItem
@@ -95,7 +96,7 @@ namespace legionexpress.Models
         public bool isSendSMS { get; set; }
         public bool isParcel { get; set; }
         public int numberOfItem { get; set; }
-        public double weight { get; set; }
+        public double? weight { get; set; }
         public int serviceLevelId { get; set; }
         public double chargeableWeight { get; set; }
         public bool isBookingRequired { get; set; }
@@ -120,6 +121,12 @@ namespace legionexpress.Models
         public string notes { get; set; }
         public string parcelNumber { get; set; }
         public int declaredLengthCount { get; set; }
+        public bool? lengthGreaterThanThreeRequest { get; set; }
+        public bool? lengthLessThanThreeRequest { get; set; }
+        public bool? residentialRequest { get; set; }
+        public bool? palletRequest { get; set; }
+        public bool? priceAmendRequest { get; set; }
+        public string notesPriceAmend { get; set; }
         public List<ConsignmentTracking> consignmentTrackings { get; set; }
         public List<ConsignmentItem> consignmentItems { get; set; }
     }

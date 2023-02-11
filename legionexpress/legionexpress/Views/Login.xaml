@@ -8,19 +8,52 @@
             <StackLayout Grid.Row="0">
                 <Image Source="StraightChevrons" HeightRequest="70" Margin="0,70,0,0"/>
                 <StackLayout Margin="30,15,30,0" VerticalOptions="CenterAndExpand">
-                    <controls:StandardEntry Padding="13" BorderColor="White"
+                    <controls:StandardEntry x:Name="UserEntry" Padding="13" BorderColor="White"
                                         BorderThickness="1" CornerRadius="5" 
-                                        FontAttributes="Italic" HorizontalTextAlignment="Center" 
+                                        HorizontalTextAlignment="Center" 
                                         PlaceholderColor="White" Placeholder="User ID"
                                         TextColor="White" Margin="0,10"
                                         Text="{Binding Login.UserID}"/>
-                    <controls:StandardEntry Padding="13" BorderColor="White" 
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                        <controls:StandardEntry x:Name="Pin1" Padding="5" BorderColor="White" 
                                         BorderThickness="1" CornerRadius="5" 
-                                        Placeholder="Pin Number.." Keyboard="Numeric" 
-                                        FontAttributes="Italic" HorizontalTextAlignment="Center"
+                                        Keyboard="Numeric" 
+                                        HorizontalTextAlignment="Center"
                                         IsPassword="True" PlaceholderColor="White"
                                         TextColor="White"
-                                        Text="{Binding Login.Pin}"/>
+                                        WidthRequest="60"
+                                        TextChanged="Pin1_TextChanged"
+                                        Text="{Binding Pin1}"/>
+                        <controls:StandardEntry x:Name="Pin2" Padding="5" BorderColor="White" 
+                                        BorderThickness="1" CornerRadius="5" 
+                                        Keyboard="Numeric" 
+                                        HorizontalTextAlignment="Center"
+                                        IsPassword="True" PlaceholderColor="White"
+                                        TextColor="White"
+                                         WidthRequest="60"
+                                        TextChanged="Pin2_TextChanged"
+                                        Text="{Binding Pin2}"/>
+                        <controls:StandardEntry x:Name="Pin3" Padding="5" BorderColor="White" 
+                                        BorderThickness="1" CornerRadius="5" 
+                                        Keyboard="Numeric" 
+                                        HorizontalTextAlignment="Center"
+                                        IsPassword="True" PlaceholderColor="White"
+                                        TextColor="White"
+                                        WidthRequest="60"
+                                        TextChanged="Pin3_TextChanged"
+                                        Text="{Binding Pin3}"/>
+                        <controls:StandardEntry x:Name="Pin4" Padding="5" BorderColor="White" 
+                                        BorderThickness="1" CornerRadius="5" 
+                                        Keyboard="Numeric" 
+                                        HorizontalTextAlignment="Center"
+                                        IsPassword="True" PlaceholderColor="White"
+                                        TextColor="White"
+                                        WidthRequest="60"
+                                        HeightRequest="50"
+                                        TextChanged="Pin4_TextChanged"
+                                        Text="{Binding Pin4}"/>
+                    </StackLayout>
+               
                     <Button Text="Log In" WidthRequest="150" Margin="15" BackgroundColor="#FF5E00" TextColor="White" CornerRadius="5" HorizontalOptions="Center" Command="{Binding LoginCommand}"/>
                     <!--<Grid RowDefinitions="50,50,50,50" ColumnDefinitions="95,95,95,95">
                         <Button  Text="1" Grid.Row="0" Grid.Column="0" BackgroundColor="#6E6259" TextColor="White"/>

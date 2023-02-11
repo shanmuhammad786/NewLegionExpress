@@ -1,4 +1,6 @@
-﻿using System;
+﻿using legionexpress.Popups;
+using Rg.Plugins.Popup.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,21 +8,16 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using Syncfusion.XForms.PopupLayout;
-using Rg.Plugins.Popup.Services;
-using legionexpress.Popups;
 
 namespace legionexpress.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class Home : ContentPage
+    public partial class WarehouseHome : ContentPage
     {
-        public Home()
+        public WarehouseHome()
         {
             InitializeComponent();
-            //popupLayout = new SfPopupLayout();
         }
-
         private async void Logout_Clicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new Login());
@@ -35,7 +32,7 @@ namespace legionexpress.Views
 
         private async void Scan_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new ScanditCollectionScanning());
+            await Navigation.PushAsync(new ScanditWarehouseScanning());
         }
 
         private async void ExemptionScan_Clicked(object sender, EventArgs e)

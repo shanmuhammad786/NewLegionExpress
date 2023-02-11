@@ -17,7 +17,7 @@ namespace legionexpress.Popups
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class AlreadyScanned : PopupPage
     {
-        public AlreadyScanned(string lengthAlert, string instructions, ShipmentResult shipmentResult, string localPostalCode)
+        public AlreadyScanned(string lengthAlert, string instructions, ShipmentResult shipmentResult, string localPostalCode, string worldOptionsCode)
         {
             InitializeComponent();
             if(!string.IsNullOrEmpty(lengthAlert))
@@ -43,6 +43,14 @@ namespace legionexpress.Popups
             else
             {
                 PostalCode.IsVisible = false;
+            }
+            if (!string.IsNullOrEmpty(worldOptionsCode))
+            {
+                WorldOptionCodeText.Text = worldOptionsCode;
+            }
+            else
+            {
+                WorldOptionCode.IsVisible = false;
             }
             BindingContext =new AlreadyScannedViewModel(shipmentResult);
         }

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rg:PopupPage  xmlns:rg="http://rotorgames.com" 
+               xmlns="http://xamarin.com/schemas/2014/forms"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               x:Class="legionexpress.Popups.AlertPopup"
+               xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup" xmlns:customrenderer="clr-namespace:legionexpress.CustomRenderer" xmlns:controls="clr-namespace:legionexpress"
+               >
+    <rg:PopupPage.Animation>
+        <animations:ScaleAnimation 
+            PositionIn="Bottom"
+            PositionOut="Bottom"
+            DurationIn="150"
+            DurationOut="150"
+            EasingIn="SinOut"
+            EasingOut="SinIn"
+            HasBackgroundAnimation="True"/>
+    </rg:PopupPage.Animation>
+    <StackLayout 
+        VerticalOptions="CenterAndExpand" 
+        BackgroundColor="Transparent"
+        HorizontalOptions="FillAndExpand" 
+        Margin="15,0,15,0"
+       >
+        <Frame CornerRadius="20"  HorizontalOptions="FillAndExpand" BackgroundColor=" #000000 " HeightRequest="150" BorderColor="White"  >
+            <StackLayout Spacing="20">
+                <Label x:Name="Alert" FontSize="18" TextColor="White" HorizontalOptions="CenterAndExpand" FontAttributes="Bold"/>
+                <Label x:Name="Description" HorizontalOptions="CenterAndExpand" FontSize="16" TextColor="White" FontAttributes="Bold"/>
+                <Button Text="OK" TextColor="White" Clicked="Button_Clicked" BackgroundColor="Orange" HorizontalOptions="CenterAndExpand" CornerRadius="10"/>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+</rg:PopupPage>
