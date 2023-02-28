@@ -25,5 +25,18 @@ namespace legionexpress.Popups
         {
             PopupNavigation.Instance.PopAsync();
         }
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            MessagingCenter.Send<string>("1", "DisableScan");
+        }
+
+        protected async override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            await Task.Delay(500);
+            if (PopupNavigation.PopupStack.Count == 0)
+                MessagingCenter.Send<string>("1", "EnableScan");
+        }
     }
 }

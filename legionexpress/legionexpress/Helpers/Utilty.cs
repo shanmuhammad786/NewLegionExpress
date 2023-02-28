@@ -9,6 +9,8 @@ namespace legionexpress.Helpers
     public class Utilty
     {
         public static string HoldandReleaseKey = "Hold";
+        public static int CollectionScanCount = 0;
+        public static int WarehouseScanCount = 0;
         public static int count = 0;
         public static string username = string.Empty;
 

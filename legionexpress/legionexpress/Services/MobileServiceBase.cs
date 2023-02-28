@@ -24,7 +24,8 @@ namespace legionexpress.Services
         protected async Task<T> PostUnauthorized<T, X>(X obj, string url)
         {
             var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
-
+            //var handler = new HttpClientHandler();
+            //handler.ServerCertificateCustomValidationCallback = (request, cert, chain, errors) => true;
             using (var httpClient = new HttpClient())
             {
                 httpClient.BaseAddress = new Uri(AppConstants.BaseUrl);

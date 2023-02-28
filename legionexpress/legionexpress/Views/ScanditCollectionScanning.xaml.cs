@@ -23,10 +23,11 @@ namespace legionexpress.Views
             viewModel = new ScanditCollectionScanningViewModel(Navigation);
             BindingContext = viewModel;
         }
-        protected override void OnAppearing()
+        protected async override void OnAppearing()
         {
             base.OnAppearing();
-            _ = this.viewModel.OnResumeAsync();
+           // this.viewModel.InitializeScanner();
+            await this.viewModel.OnResumeAsync();
         }
 
         protected override void OnDisappearing()

@@ -7,6 +7,7 @@ using Android.Views;
 using Android.Widget;
 using Android.OS;
 using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
+using System.Net;
 
 namespace legionexpress.Droid
 {
@@ -17,7 +18,6 @@ namespace legionexpress.Droid
         {
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
-
             base.OnCreate(savedInstanceState);
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);

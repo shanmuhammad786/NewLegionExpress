@@ -516,8 +516,8 @@ namespace legionexpress.ViewModels
                     var response = await _service.AddNote(obj);
                     if (response != null && response.hasError == false)
                     {
+                        await PopupNavigation.Instance.PopAsync();
                         await PopupNavigation.Instance.PushAsync(new AlertPopup("Alert", "Notes is Submitted Successfully"));
-                        PopupNavigation.Instance.PopAsync();
                     }
                 }
                 IsRunning = true;

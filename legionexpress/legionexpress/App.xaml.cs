@@ -3,7 +3,9 @@ using legionexpress.Views;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
+using Rg.Plugins.Popup.Services;
 using System;
+using System.Linq;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -47,10 +49,28 @@ namespace legionexpress
             Preferences.Remove("ConsignmentKey");
         }
 
-        protected override void OnSleep()
+        protected override async void OnSleep()
         {
-            //MessagingCenter.Send(this, MessageKeys.OnSleep);
+            try
+            {
+                if (PopupNavigation.Instance.PopupStack.Count > 0)
+                {
+                    await PopupNavigation.Instance.PopAllAsync();
+                }
+                var navigationList = MainPage.Navigation.NavigationStack.ToList();
+                var isCurrentPageLogin = navigationList.Any(x => x.GetType().Name == "Login");
+                if(!isCurrentPageLogin)
+                {
+                    MainPage = new NavigationPage(new CollectionHome());
+                }
+            }
+            catch (Exception ex)
+            {
 
+               
+            }
+       
+            //MessagingCenter.Send(this, MessageKeys.OnSleep);
         }
 
         protected override void OnResume()

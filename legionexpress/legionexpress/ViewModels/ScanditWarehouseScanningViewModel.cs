@@ -36,7 +36,7 @@ namespace legionexpress.ViewModels
         ShipmentService _service;
         private bool _isLoading;
         private bool _amendmendVisibility;
-        private string _warehouseScannedCount;
+        private int _warehouseScannedCount;
         #endregion
         #region PublicProperties
         public bool AmendmendVisibility
@@ -51,7 +51,7 @@ namespace legionexpress.ViewModels
                 NotifyPropertyChanged();
             }
         }
-        public string WarehouseScannedCount
+        public int WarehouseScannedCount
         {
             get
             {
@@ -133,7 +133,9 @@ namespace legionexpress.ViewModels
             this.Navigation = navigation;
             _service = new ShipmentService();
             AmendmendVisibility = true;
-            GetScannedCount();
+            Preferences.Remove("WarehouseScannedCount");
+            WarehouseScannedCount = 0;
+            Utilty.WarehouseScanCount = 0;
             this.InitializeScanner();
         }
         #region Commands
@@ -141,15 +143,7 @@ namespace legionexpress.ViewModels
         public ICommand InstructionsCloseCommand => new Command(InstructionsClose);
         public ICommand StopScanningCommand => new Command(StopScanning);
         #endregion
-        private async void GetScannedCount()
-        {
-            var count = Preferences.Get("WarehouseScannedCount", "0");
-            if (count != null)
-            {
-                WarehouseScannedCount = count;
-            }
-
-        }
+     
         private void Close()
         {
             PopupNavigation.Instance.PopAsync();
@@ -313,11 +307,14 @@ namespace legionexpress.ViewModels
                 await Task.Delay(500);
                 if (shipment != null && shipment.hasError == false)
                 {
-                    var count = Preferences.Get("WarehouseScannedCount", "0");
-                    var newCount = Convert.ToInt32(count);
-                    newCount = newCount + 1;
-                    Preferences.Set("WarehouseScannedCount", newCount.ToString());
-                    WarehouseScannedCount = newCount.ToString();
+                    var newCount = Utilty.WarehouseScanCount + 1;
+                    WarehouseScannedCount = newCount;
+                    Utilty.WarehouseScanCount = newCount;
+                    //var count = Preferences.Get("WarehouseScannedCount", "0");
+                    //var newCount = Convert.ToInt32(count);
+                    //newCount = newCount + 1;
+                    //Preferences.Set("WarehouseScannedCount", newCount.ToString());
+                    //WarehouseScannedCount = newCount.ToString();
                     if (shipment.result != null)
                     {
                         string lengthAlert = string.Empty;
@@ -337,6 +334,7 @@ namespace legionexpress.ViewModels
                             localPostalCode = $"Local Delivery Alert: {shipment.result.deliveryPostcode}";
                         }
                         string worldOptionCode = string.Empty;
+                        shipment.result.deliveryPostcode = "AB";
                         var isWorldOptions = await isWorldOptionsAlert(shipment.result.deliveryPostcode);
                         if (isWorldOptions)
                         {
@@ -435,6 +433,7 @@ namespace legionexpress.ViewModels
             localPostalCodeList.Add("NG1");
             localPostalCodeList.Add("NG2");
             localPostalCodeList.Add("NG3");
+            localPostalCodeList.Add("NG4");
             localPostalCodeList.Add("NG5");
             localPostalCodeList.Add("NG6");
             localPostalCodeList.Add("NG7");
@@ -455,6 +454,7 @@ namespace legionexpress.ViewModels
             localPostalCodeList.Add("S9");
             localPostalCodeList.Add("S10");
             localPostalCodeList.Add("S11");
+            localPostalCodeList.Add("S12");
             localPostalCodeList.Add("S40");
             localPostalCodeList.Add("S41");
             localPostalCodeList.Add("S42");
