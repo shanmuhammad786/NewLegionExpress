@@ -334,7 +334,6 @@ namespace legionexpress.ViewModels
                             localPostalCode = $"Local Delivery Alert: {shipment.result.deliveryPostcode}";
                         }
                         string worldOptionCode = string.Empty;
-                        shipment.result.deliveryPostcode = "AB";
                         var isWorldOptions = await isWorldOptionsAlert(shipment.result.deliveryPostcode);
                         if (isWorldOptions)
                         {
@@ -494,8 +493,8 @@ namespace legionexpress.ViewModels
             localPostalCodeList.Add("KW");
             localPostalCodeList.Add("PA");
             localPostalCodeList.Add("PH");
-            localPostalCodeList.Add("P030");
-            localPostalCodeList.Add("P031");
+            localPostalCodeList.Add("PO30");
+            localPostalCodeList.Add("PO31");
             localPostalCodeList.Add("PO32");
             localPostalCodeList.Add("PO33");
             localPostalCodeList.Add("PO34");
@@ -517,6 +516,24 @@ namespace legionexpress.ViewModels
                 {
                     string[] str = pC.Split(' ');
                     if (str[0] == item)
+                    {
+                        return true;
+                    }
+                }
+                else if (pC.Length > 1)
+                {
+                    var postalCode = pC.Substring(0, 2);
+                    if (postalCode.Contains("PO") || postalCode.Contains("TR"))
+                    {
+                        if (pC == item)
+                        {
+                            return true;
+                        }
+
+                    }
+                    else if (postalCode.Contains("AB") || postalCode.Contains("BT") || postalCode.Contains("HS") || postalCode.Contains("IM")
+                        || postalCode.Contains("IV") || postalCode.Contains("KA") || postalCode.Contains("KW")
+                        || postalCode.Contains("PA") || postalCode.Contains("PH"))
                     {
                         return true;
                     }

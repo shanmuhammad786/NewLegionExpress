@@ -1,6 +1,41 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:allowBackup="false" android:versionCode="1" android:versionName="1.0" package="allegiance.apk" android:installLocation="auto">
-	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="30" />
-	<application android:label="legionexpress.Android" android:theme="@style/MainTheme"></application>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:allowBackup="false" package="allegiance.apk" android:installLocation="auto" android:versionCode="3" android:versionName="3.0">
+	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33" />
+	<!--<application android:label="legionexpress.Android" android:theme="@style/MainTheme"></application>-->
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<application android:label="legionexpress.Android" android:theme="@style/MainTheme" android:usesCleartextTraffic="true">
+		<!--<provider android:name="android.support.v4.content.FileProvider" android:authorities="legionexpress.fileprovider" android:exported="false" android:grantUriPermissions="true">
+			-->
+		<!--<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths"></meta-data>-->
+		<!--
+		</provider>-->
+		<!--<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver" android:exported="false" />
+		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:exported="true" android:permission="com.google.android.c2dm.permission.SEND">
+			<intent-filter>
+				<action android:name="com.google.android.c2dm.intent.RECEIVE" />
+				<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+				<category android:name="${applicationId}" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name=".MyMessagingService" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</receiver>-->
+		<!--<service android:name=".PNFirebaseMessagingService" android:exported="false">
+			<intent-filter>
+				<action android:name="com.google.firebase.MESSAGING_EVENT" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</service>-->
+		<!--<service android:name="crc64ffe11d6127499edb.MyMessagingService" android:exported="false" android:permission="com.google.android.c2dm.permission.SEND">
+			<intent-filter>
+				<action android:name="com.google.firebase.MESSAGING_EVENT" />
+			</intent-filter>
+		</service>
+		<service android:name="crc64ffe11d6127499edb.MyFirebaseIDInstance" android:exported="false" android:permission="com.google.android.c2dm.permission.SEND">
+			<intent-filter>
+				<action android:name="com.google.firebase.MESSAGING_EVENT" />
+			</intent-filter>
+		</service>-->
+	</application>
 </manifest>

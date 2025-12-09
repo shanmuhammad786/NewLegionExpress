@@ -13,7 +13,7 @@ namespace legionexpress.Helpers
         public static int WarehouseScanCount = 0;
         public static int count = 0;
         public static string username = string.Empty;
-
+        public static string FirebaseToken = "";
         public static async Task SetSecureStorageValue(string key, string value)
         {
             try

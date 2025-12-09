@@ -130,4 +130,21 @@ namespace legionexpress.Models
         public List<ConsignmentTracking> consignmentTrackings { get; set; }
         public List<ConsignmentItem> consignmentItems { get; set; }
     }
+
+    public class CollectionResult
+    {
+        public int Id { get; set; }
+        public string Postcode { get; set; }
+        public string Address1 { get; set; }
+        public string CustomerName { get; set; }
+        public string RunNumber { get; set; }
+        public string Notes { get; set; }
+        public string DeclineNotes { get; set; }
+        public string Status { get; set; }
+        public string CollectionTimeFrom { get; set; }
+        public string CollectionTimeTo { get; set; }
+        public bool IsViewedByDriver { get; set; }
+        public DateTime RunDate { get; set; }
+
+    }
 }

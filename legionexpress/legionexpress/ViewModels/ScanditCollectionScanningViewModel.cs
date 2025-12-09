@@ -37,6 +37,7 @@ namespace legionexpress.ViewModels
         private bool _isLoading;
         private bool _amendmendVisibility;
         private int _collectionScannedCount;
+        private ShipmentCollectionDetailsModel _shipmentDetails;
         #endregion
         #region PublicProperties
         public bool AmendmendVisibility
@@ -60,8 +61,19 @@ namespace legionexpress.ViewModels
             set
             {
                 _collectionScannedCount = value;
-                // NotifyPropertyChanged();
                 OnPropertyChanged("CollectionScannedCount");
+            }
+        }
+        public ShipmentCollectionDetailsModel ShipmentDetails
+        {
+            get
+            {
+                return _shipmentDetails;
+            }
+            set
+            {
+                _shipmentDetails = value;
+                OnPropertyChanged("ShipmentDetails");
             }
         }
         #endregion
@@ -320,6 +332,7 @@ namespace legionexpress.ViewModels
                 await Task.Delay(500);
                 if (shipment != null && shipment.hasError == false)
                 {
+                    this.ShipmentDetails = shipment;
                     //var count = Preferences.Get("CollectionScannedCount", "0");
                     // var newCount = Convert.ToInt32(count);
                      var newCount = Utilty.CollectionScanCount + 1;
@@ -330,40 +343,40 @@ namespace legionexpress.ViewModels
                     if (shipment.result != null)
                     {
                         string lengthAlert = string.Empty;
-                        if (shipment.result.declaredLengthCount > 0)
+                        if (shipment.result.shipment.declaredLengthCount > 0)
                         {
                             lengthAlert = "Length Alert";
                         }
                         string instructions = string.Empty;
-                        if (!string.IsNullOrEmpty(shipment.result.deliveryInstruction))
+                        if (!string.IsNullOrEmpty(shipment.result.shipment.deliveryInstruction))
                         {
-                            instructions = shipment.result.deliveryInstruction;
+                            instructions = shipment.result.shipment.deliveryInstruction;
                         }
                         string localPostalCode = string.Empty;
-                        var isLocalPost = await isLocalPostalAlert(shipment.result.deliveryPostcode);
+                        var isLocalPost = await isLocalPostalAlert(shipment.result.shipment.deliveryPostcode);
                         if (isLocalPost)
                         {
-                            localPostalCode = $"Local Delivery Alert: {shipment.result.deliveryPostcode}";
+                            localPostalCode = $"Local Delivery Alert: {shipment.result.shipment.deliveryPostcode}";
                         }
                         string worldOptionCode = string.Empty;
-                        var isWorldOptions = await isWorldOptionsAlert(shipment.result.deliveryPostcode);
+                        var isWorldOptions = await isWorldOptionsAlert(shipment.result.shipment.deliveryPostcode);
                         if (isWorldOptions)
                         {
-                            worldOptionCode = $"World Options Alert: {shipment.result.deliveryPostcode}";
+                            worldOptionCode = $"World Options Alert: {shipment.result.shipment.deliveryPostcode}";
                         }
-                        string[] str = shipment.result.parcelNumber.Split(' ');
+                        string[] str = shipment.result.shipment.parcelNumber.Split(' ');
                         var number = str[0];
-                        var consignmmentItem = shipment.result.consignmentItems.Where(x => x.itemNumber == number).FirstOrDefault();
+                        var consignmmentItem = shipment.result.shipment.consignmentItems.Where(x => x.itemNumber == number).FirstOrDefault();
                         Preferences.Set("ConsignmentKey", consignmmentItem.id.ToString());
-                        if (shipment.isAlreadyScanned)
+                        if (shipment.result.isCollectionScanned)
                         {
 
-                            await PopupNavigation.Instance.PushAsync(new AlreadyScanned(lengthAlert, instructions, shipment.result, localPostalCode, worldOptionCode));
+                            await PopupNavigation.Instance.PushAsync(new AlreadyScanned(lengthAlert, instructions, shipment.result.shipment, localPostalCode, worldOptionCode));
                             IsLoading = false;
                         }
                         else
                         {
-                            if (shipment.result.declaredLengthCount > 0 || !string.IsNullOrEmpty(instructions) || !string.IsNullOrEmpty(localPostalCode) || !string.IsNullOrEmpty(worldOptionCode))
+                            if (shipment.result.shipment.declaredLengthCount > 0 || !string.IsNullOrEmpty(instructions) || !string.IsNullOrEmpty(localPostalCode) || !string.IsNullOrEmpty(worldOptionCode))
                             {
                                 IsLoading = false;
                                 await PopupNavigation.Instance.PushAsync(new Instructions(lengthAlert, instructions, localPostalCode, worldOptionCode) { BindingContext = this });
@@ -507,8 +520,8 @@ namespace legionexpress.ViewModels
             localPostalCodeList.Add("KW");
             localPostalCodeList.Add("PA");
             localPostalCodeList.Add("PH");
-            localPostalCodeList.Add("P030");
-            localPostalCodeList.Add("P031");
+            localPostalCodeList.Add("PO30");
+            localPostalCodeList.Add("PO31");
             localPostalCodeList.Add("PO32");
             localPostalCodeList.Add("PO33");
             localPostalCodeList.Add("PO34");
@@ -530,6 +543,24 @@ namespace legionexpress.ViewModels
                 {
                     string[] str = pC.Split(' ');
                     if (str[0] == item)
+                    {
+                        return true;
+                    }
+                }
+                else if(pC.Length >1)
+                {
+                    var postalCode = pC.Substring(0, 2);
+                    if(postalCode.Contains("PO") || postalCode.Contains("TR"))
+                    {
+                        if(pC == item)
+                        {
+                            return true;
+                        }
+                      
+                    }
+                    else if(postalCode.Contains("AB") || postalCode.Contains("BT") || postalCode.Contains("HS") || postalCode.Contains("IM")
+                        || postalCode.Contains("IV") || postalCode.Contains("KA") || postalCode.Contains("KW") 
+                        || postalCode.Contains("PA") || postalCode.Contains("PH"))
                     {
                         return true;
                     }

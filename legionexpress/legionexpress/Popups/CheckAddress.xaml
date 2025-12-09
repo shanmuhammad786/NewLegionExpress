@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rg:PopupPage  xmlns:rg="http://rotorgames.com"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:customrenderer="clr-namespace:legionexpress.CustomRenderer"
+               x:Class="legionexpress.Popups.CheckAddress">
+    <rg:PopupPage.Animation>
+        <rg:ScaleAnimation 
+            PositionIn="Bottom"
+            PositionOut="Bottom"
+            DurationIn="150"
+            DurationOut="150"
+            EasingIn="SinOut"
+            EasingOut="SinIn"
+            HasBackgroundAnimation="True"/>
+    </rg:PopupPage.Animation>
+    <StackLayout    VerticalOptions="CenterAndExpand" 
+        BackgroundColor="Transparent"
+        HorizontalOptions="FillAndExpand" >
+        <Frame CornerRadius="20"  HorizontalOptions="FillAndExpand" BackgroundColor="White" HeightRequest="370">
+            <StackLayout Spacing="20">
+                <Label Text="Check Address" TextColor="Black" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                    <Label Text="Date: " TextColor="Black" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="{Binding CurrentDate}" TextColor="Black" FontSize="18" FontAttributes="Bold"/>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                    <Label Text="Time: " TextColor="Black" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="{Binding CurrentTime}" TextColor="Black" FontSize="18" FontAttributes="Bold"/>
+                </StackLayout>
+                <Frame BorderColor="Black" Padding="1" HasShadow="False">
+                    <customrenderer:BorderlessEditor Placeholder="Notes:" PlaceholderColor="Black" HeightRequest="100"/>
+                </Frame>
+                <Button Text="Take Attempted Photo" TextColor="Black" CornerRadius="2" BackgroundColor="White" BorderColor="Black" BorderWidth="1"/>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="40">
+                    <Button Text="Submit" TextColor="Black" CornerRadius="2" BackgroundColor="White" BorderColor="Black" BorderWidth="1"></Button>
+                    <Button Text="Cancel" Command="{Binding ClosePopupCommand}" TextColor="Black" CornerRadius="2" BackgroundColor="White" BorderColor="Black" BorderWidth="1"></Button>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+</rg:PopupPage>

@@ -121,14 +121,14 @@ namespace legionexpress.Services
             return await GetScannedShipment(url);
         }
 
-        public async Task<ShipmentDetailsModel> ShipmentCollectionScanned(string networkId)
+        public async Task<ShipmentCollectionDetailsModel> ShipmentCollectionScanned(string networkId)
         {
             var obj = new
             {
                 networkShipmentId = networkId
             };
             string url = $"api/v1/shipment/shipment-collection-scan";
-            return await PostShipmentCollectionScanned<ShipmentDetailsModel>(obj,url, networkId, true);
+            return await PostShipmentCollectionScanned<ShipmentCollectionDetailsModel>(obj,url, networkId, true);
         }
         public async Task<ShipmentDetailsModel> ShipmentWarehouseScanned(string networkId)
         {
@@ -137,7 +137,37 @@ namespace legionexpress.Services
                 networkShipmentId = networkId
             };
             string url = $"api/v1/shipment/shipment-warehouse-scan";
-            return await PostShipmentCollectionScanned<ShipmentDetailsModel>(obj, url, networkId, false);
+            return await PostShipmentWarehouseScanned<ShipmentDetailsModel>(obj, url, networkId, false);
+        }
+        public async Task<DriverCollectionResponse> DriverCollection(int? status = null)
+        {
+            string url = $"api/v1/collection/get-driver-collections";
+            if (status.HasValue)
+            {
+                url += $"?Status={status.Value}";
+            }
+            return await GetDriverCollections(url);
+        }
+
+        public async Task<DeclineCollectionResponse> DeclineCollection(DeclineCollectionRequestModel request)
+        {
+            string url = $"api/v1/collection/decline-collection";
+            
+            return await DeclineCollectionPost(request,url);
+        }
+
+        public async Task<AcceptCollectionResponse> AcceptCollection(AcceptCollectionRequestModel request)
+        {
+            string url = $"api/v1/collection/accept-collection";
+
+            return await AcceptCollectionPost(request, url);
+        }
+
+        public async Task<UpdateDriverNotesResponse> UpdateDriverNotes(DriverNotesRequestModel request)
+        {
+            string url = $"api/v1/collection/update-driver-notes";
+
+            return await UpdateDriverNotes(request, url);
         }
     }
 }

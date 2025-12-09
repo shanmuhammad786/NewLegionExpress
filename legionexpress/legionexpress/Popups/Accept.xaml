@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rg:PopupPage  xmlns:rg="http://rotorgames.com"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="legionexpress.Popups.Accept">
+    <rg:PopupPage.Animation>
+        <rg:ScaleAnimation 
+            PositionIn="Bottom"
+            PositionOut="Bottom"
+            DurationIn="150"
+            DurationOut="150"
+            EasingIn="SinOut"
+            EasingOut="SinIn"
+            HasBackgroundAnimation="True"/>
+    </rg:PopupPage.Animation>
+    <StackLayout    VerticalOptions="CenterAndExpand" 
+        BackgroundColor="Transparent"
+        HorizontalOptions="FillAndExpand" >
+        <Frame CornerRadius="20"  HorizontalOptions="FillAndExpand" BackgroundColor="White" HeightRequest="400">
+            <StackLayout>
+                <Frame BorderColor="SkyBlue">
+                    <Label Text="Collection Request" HorizontalTextAlignment="Center" TextColor="Black" FontAttributes="Bold"/>
+                </Frame>
+                <Frame BorderColor="SkyBlue">
+                    <StackLayout>
+                        <Label Text="Golconda" FontSize="16" HorizontalTextAlignment="Center" TextColor="Black" FontAttributes="Bold"/>
+                    </StackLayout>
+                </Frame>
+                <Frame Padding="2" BorderColor="SkyBlue">
+                    <Editor Placeholder="Notes Section" PlaceholderColor="Black" BackgroundColor="White" HeightRequest="150"/>
+                </Frame>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                    <Button Text="Accept" BorderWidth="1" BorderColor="Black" TextColor="Black" BackgroundColor="White"/>
+                    <Button Text="Refuse"  Command="{Binding ClosePopupCommand}" BorderWidth="1" BorderColor="Black" TextColor="Black" BackgroundColor="White"/>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+</rg:PopupPage>

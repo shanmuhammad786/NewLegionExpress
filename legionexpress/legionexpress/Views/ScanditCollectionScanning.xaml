@@ -36,15 +36,28 @@
                 <Frame Padding="40,15,40,15" HorizontalOptions="CenterAndExpand" Margin="30,5,30,0" CornerRadius="15">
                     <Label Text="Collection Scan" FontSize="16" FontAttributes="Bold" TextColor="Black" HorizontalTextAlignment="Center"/>
                 </Frame>
+                <Frame Padding="40,15,40,15" HorizontalOptions="CenterAndExpand" Margin="30,5,30,0" CornerRadius="15">
+                    <Label Text="{Binding ShipmentDetails.result.customerName}" FontSize="16" FontAttributes="Bold" TextColor="Black" HorizontalTextAlignment="Center"/>
+                </Frame>
                 <!--<Button Text="Warehouse Scan" IsEnabled="False" CornerRadius="10" Margin="40,0,40,0" BackgroundColor="White" TextColor="Black"  />-->
             </StackLayout>
-            <StackLayout  AbsoluteLayout.LayoutBounds="0,0.75,1,0.1"
+            <StackLayout  AbsoluteLayout.LayoutBounds="3,0.75,0.9,0.1"
+                    AbsoluteLayout.LayoutFlags="All">
+                <Frame BackgroundColor="Black" HorizontalOptions="CenterAndExpand" CornerRadius="10" BorderColor="Orange">
+                    <StackLayout>
+                        <Label Text="Items Expected" TextColor="White"/>
+                        <Label Text="{Binding ShipmentDetails.result.outstandingItemToScanCount}" TextColor="White" FontAttributes="Bold" HorizontalOptions="CenterAndExpand"/>
+                    </StackLayout> 
+                </Frame>
+                
+            </StackLayout>
+            <StackLayout  AbsoluteLayout.LayoutBounds="0,0.75,0.5,0.1"
                     AbsoluteLayout.LayoutFlags="All">
                 <Frame BackgroundColor="Black" HorizontalOptions="CenterAndExpand" CornerRadius="10" BorderColor="Orange">
                     <StackLayout>
                         <Label Text="Scanned Items" TextColor="White"/>
-                        <Label Text="{Binding CollectionScannedCount}" TextColor="White" FontAttributes="Bold" HorizontalOptions="CenterAndExpand"/>
-                    </StackLayout> 
+                        <Label Text="{Binding ShipmentDetails.result.itemToScanCount}" TextColor="White" FontAttributes="Bold" HorizontalOptions="CenterAndExpand"/>
+                    </StackLayout>
                 </Frame>
             </StackLayout>
             <StackLayout  AbsoluteLayout.LayoutBounds="0,0.90,1,0.1"

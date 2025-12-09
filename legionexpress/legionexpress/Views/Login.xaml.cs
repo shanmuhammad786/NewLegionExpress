@@ -1,4 +1,5 @@
-﻿using legionexpress.ViewModels;
+﻿using legionexpress.Helpers;
+using legionexpress.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,10 @@ namespace legionexpress.Views
             InitializeComponent();
             viewModel = new LoginViewModel(Navigation);
             BindingContext = viewModel;
+            if (string.IsNullOrEmpty(Utilty.FirebaseToken))
+            {
+                MessagingCenter.Send<string>("1", "GetToken");
+            }
         }
         protected async override void OnAppearing()
         {

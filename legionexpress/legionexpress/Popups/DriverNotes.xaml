@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rg:PopupPage  xmlns:rg="http://rotorgames.com"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="legionexpress.Popups.DriverNotes">
+    <rg:PopupPage.Animation>
+        <rg:ScaleAnimation 
+            PositionIn="Bottom"
+            PositionOut="Bottom"
+            DurationIn="150"
+            DurationOut="150"
+            EasingIn="SinOut"
+            EasingOut="SinIn"
+            HasBackgroundAnimation="True"/>
+    </rg:PopupPage.Animation>
+    <Grid RowDefinitions="*">
+        <StackLayout    VerticalOptions="CenterAndExpand" Grid.Row="0"
+        BackgroundColor="Transparent"
+        HorizontalOptions="FillAndExpand" >
+        <Frame CornerRadius="20"  HorizontalOptions="FillAndExpand" BackgroundColor="White" HeightRequest="400">
+            <StackLayout>
+                <Frame BorderColor="SkyBlue">
+                    <Label Text="Note To Depot" HorizontalTextAlignment="Center" TextColor="Black" FontAttributes="Bold"/>
+                </Frame>
+                <Frame BorderColor="SkyBlue">
+                    <StackLayout>
+                        <Label Text="{Binding SelectedItem.CustomerName}" HorizontalTextAlignment="Center" TextColor="Black" FontAttributes="Bold"/>
+                        <Label Text="{Binding SelectedItem.FullAddress}" HorizontalTextAlignment="Center" TextColor="Black" FontAttributes="Bold"/>
+                        <Label Text="{Binding SelectedItem.Notes}" HorizontalTextAlignment="Center" TextColor="Black" FontAttributes="Bold"/>
+                    </StackLayout>
+                </Frame>
+                <Frame Padding="2" BorderColor="Red">
+                  <Editor Placeholder="Notes" PlaceholderColor="Black" BackgroundColor="White" Text="{Binding Notes}" TextColor="Black" HeightRequest="150"/>
+                </Frame>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                    <Button Text="Submit" Command="{Binding SubmitPopupCommand}" BorderWidth="1" BorderColor="Black" TextColor="Black" BackgroundColor="White"/>
+                    <Button Text="Cancel" Command="{Binding ClosePopupCommand}" BorderWidth="1" BorderColor="Black" TextColor="Black" BackgroundColor="White"/>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+
+    <ActivityIndicator IsRunning="{Binding IsLoading}" Grid.Row="0" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+        </Grid>
+    
+</rg:PopupPage>
