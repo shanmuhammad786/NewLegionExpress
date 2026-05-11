@@ -816,6 +816,125 @@ namespace legionexpress.Services
             }
         }
 
+        protected async Task<AcceptCollectionResponse> AcceptCollectionsPost(AcceptCollectionRequestListModel obj, string url)
+        {
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
+
+            using (var httpClient = new HttpClient())
+            {
+
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage();
+                    request.RequestUri = new Uri(AppConstants.BaseUrl + url);
+                    var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                    request.Content = content;
+                    request.Method = HttpMethod.Post;
+                    var token = Preferences.Get("token", "default_value");
+                    request.Headers.Add("X-ApiKey", token);
+                    responseMessage = await httpClient.SendAsync(request);
+                    var response = await responseMessage.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<AcceptCollectionResponse>(response);
+                    if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
+                        return data;
+                    }
+                    return data;
+                }
+                catch (Exception exp)
+                {
+                    if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
+                    }
+                    else
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
+                    throw exp;
+                }
+            }
+        }
+
+        protected async Task<AcceptCollectionResponse> DeclineCollectionsPost(refuseCollectionRequestModel obj, string url)
+        {
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
+
+            using (var httpClient = new HttpClient())
+            {
+
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage();
+                    request.RequestUri = new Uri(AppConstants.BaseUrl + url);
+                    var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                    request.Content = content;
+                    request.Method = HttpMethod.Post;
+                    var token = Preferences.Get("token", "default_value");
+                    request.Headers.Add("X-ApiKey", token);
+                    responseMessage = await httpClient.SendAsync(request);
+                    var response = await responseMessage.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<AcceptCollectionResponse>(response);
+                    if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
+                        return data;
+                    }
+                    return data;
+                }
+                catch (Exception exp)
+                {
+                    if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
+                    }
+                    else
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
+                    throw exp;
+                }
+            }
+        }
+
+        protected async Task<AcceptCollectionResponse> RefuseCollectionPost(refuseCollectionRequestModel obj, string url)
+        {
+            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            var requestBody = await Task.Run(() => JsonConvert.SerializeObject(obj));
+
+            using (var httpClient = new HttpClient())
+            {
+
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage();
+                    request.RequestUri = new Uri(AppConstants.BaseUrl + url);
+                    var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                    request.Content = content;
+                    request.Method = HttpMethod.Post;
+                    var token = Preferences.Get("token", "default_value");
+                    request.Headers.Add("X-ApiKey", token);
+                    responseMessage = await httpClient.SendAsync(request);
+                    var response = await responseMessage.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<AcceptCollectionResponse>(response);
+                    if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "Something went wrong please try again"));
+                        return data;
+                    }
+                    return data;
+                }
+                catch (Exception exp)
+                {
+                    if (responseMessage.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", "You do not have access to this resource. Invalid API Key!"));
+                    }
+                    else
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", exp.ToString()));
+                    throw exp;
+                }
+            }
+        }
 
         protected async Task<UpdateDriverNotesResponse> UpdateDriverNotes(DriverNotesRequestModel obj, string url)
         {

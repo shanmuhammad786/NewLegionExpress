@@ -84,6 +84,7 @@ namespace legionexpress.ViewModels
         });
         #endregion
         #endregion
+
         public ColDelViewModel()
         {
             _shipmentService = new ShipmentService();
@@ -154,6 +155,7 @@ namespace legionexpress.ViewModels
         {
             await PopupNavigation.Instance.PushAsync(new DriverNotes(selectedItem));
         }
+
         public async void Accept(DriverCollection selectedItem)
         {
             try
@@ -182,6 +184,152 @@ namespace legionexpress.ViewModels
 
             //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
         }
+
+        public async void AcceptCollection(DriverCollection selectedItem)
+        {
+            try
+            {
+                this.IsLoading = true;
+                var obj = new AcceptCollectionRequestListModel
+                {
+                    ids = new List<int> { selectedItem.Id }
+                };
+                var response = await _shipmentService.AcceptCollections(obj);
+
+                if (response != null && !response.HasError && response.Result != null)
+                {
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Success", "Collection Accept Successfully"));
+                    LoadList();
+
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
+            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
+        }
+
+        public async void RefuseColleciton(DriverCollection selectedItem)
+        {
+            try
+            {
+                this.IsLoading = true;
+                var obj = new refuseCollectionRequestModel
+                {
+                    id = selectedItem.Id,
+                };
+                var response = await _shipmentService.RefuseCollection(obj);
+
+                if (response != null && !response.HasError && response.Result != null)
+                {
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Success", "Collection Refuse Successfully"));
+                    LoadList();
+
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
+            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
+        }
+
+        public async void CompleteColleciton(DriverCollection selectedItem)
+        {
+            try
+            {
+                this.IsLoading = true;
+                var obj = new refuseCollectionRequestModel
+                {
+                    id = selectedItem.Id,
+                };
+                var response = await _shipmentService.CompleteCollection(obj);
+
+                if (response != null && !response.HasError && response.Result != null)
+                {
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Success", "Collection Complete Successfully"));
+                    LoadList();
+
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
+            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
+        }
+
+        public async void NothingToColleciton(DriverCollection selectedItem)
+        {
+            try
+            {
+                this.IsLoading = true;
+                var obj = new refuseCollectionRequestModel
+                {
+                    id = selectedItem.Id,
+                };
+                var response = await _shipmentService.NothingToCollection(obj);
+
+                if (response != null && !response.HasError && response.Result != null)
+                {
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Success", "Collection Updated Successfully"));
+                    LoadList();
+
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
+            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
+        }
+
+        public async void DeclineColleciton(DriverCollection selectedItem)
+        {
+            try
+            {
+                this.IsLoading = true;
+                var obj = new refuseCollectionRequestModel
+                {
+                    id = selectedItem.Id,
+                };
+                var response = await _shipmentService.DeclineCollections(obj);
+
+                if (response != null && !response.HasError && response.Result != null)
+                {
+                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Success", "Collection Decline Successfully"));
+                    LoadList();
+
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
+            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
+        }
+
         public async void ClosePopup()
         {
             await PopupNavigation.Instance.PopAsync();

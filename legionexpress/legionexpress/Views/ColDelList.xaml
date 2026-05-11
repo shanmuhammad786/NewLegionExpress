@@ -1,0 +1,343 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="legionexpress.Views.ColDelList">
+    <Grid RowDefinitions="Auto,*">
+        <StackLayout    VerticalOptions="CenterAndExpand" 
+                        BackgroundColor="Transparent"
+                        HorizontalOptions="FillAndExpand"
+                        Grid.Row="0">
+        <Frame CornerRadius="5" Margin="5,0"  HorizontalOptions="FillAndExpand" BackgroundColor=" #000000 " HeightRequest="800">
+            <StackLayout Padding="-10">
+                <Frame
+                    Padding="5"
+                    CornerRadius="5"
+                    HeightRequest="50"
+                    HasShadow="True"
+                    BackgroundColor="#0D0D0D"
+                    BorderColor="#333333"
+                    Margin="0">
+
+                    <Grid ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <!-- Left Button -->
+                        <Button 
+                            Text="All"
+                            Grid.Column="0"
+                            CornerRadius="5"
+                            WidthRequest="100"
+                            HeightRequest="40"
+                            HorizontalOptions="Start"
+                            Command="{Binding AllCommand}"
+                            Style="{Binding AllButtonStyle}" />
+                        
+                        <Image Grid.Column="1" Source="barcode.png" HorizontalOptions="FillAndExpand" HeightRequest="30" WidthRequest="40" >
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="scanner_Tapped"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <!-- Right Button -->
+                        <Button  
+                            Text="Done"
+                            Grid.Column="2"
+                            CornerRadius="5"
+                            WidthRequest="100"
+                            HeightRequest="40"
+                            HorizontalOptions="End"
+                            Command="{Binding DoneCommand}"
+                            Style="{Binding DoneButtonStyle}" />
+
+                    </Grid>
+                </Frame>
+                
+                <StackLayout>
+                    <ListView ItemsSource="{Binding ColDelList}" HasUnevenRows="True" SeparatorVisibility="None" SelectionMode="None"
+                              IsVisible="{Binding ColDelList.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Frame CornerRadius="5" Margin="5" Padding="10">
+                                        <StackLayout>
+                                            <StackLayout Orientation="Horizontal" Spacing="20">
+                                                <Button Text="Collection"  BackgroundColor="White" TextColor="Black" BorderColor="Black" BorderWidth="1"/>
+                                            </StackLayout>
+                                            <Grid HorizontalOptions="FillAndExpand">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Centered Text -->
+                                                <Label Grid.Column="0"
+                                                       Grid.ColumnSpan="2"
+                                                       Text="{Binding CustomerName}"
+                                                       FontSize="17"
+                                                       FontAttributes="Bold"
+                                                       TextColor="Black"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center"/>
+
+                                                <!-- Icon (right side) -->
+                                                <Image Grid.Column="1"
+                                                       HeightRequest="30"
+                                                       WidthRequest="40"
+                                                       VerticalOptions="Center"
+                                                       HorizontalOptions="End"
+                                                       IsVisible="False">
+
+                                                    <Image.Triggers>
+                                                        <!-- Confirmed -->
+                                                        <DataTrigger TargetType="Image"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="Confirmed By Driver">
+                                                            <Setter Property="Source" Value="check.png"/>
+                                                            <Setter Property="IsVisible" Value="True"/>
+                                                        </DataTrigger>
+
+                                                        <!-- Completed -->
+                                                        <DataTrigger TargetType="Image"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="Completed">
+                                                            <Setter Property="Source" Value="doublecheck.png"/>
+                                                            <Setter Property="IsVisible" Value="True"/>
+                                                        </DataTrigger>
+                                                    </Image.Triggers>
+                                                </Image>
+                                            </Grid>
+                                            <Label Text="{Binding Address1}" HorizontalOptions="CenterAndExpand" FontSize="15" FontAttributes="Bold" TextColor="Black"/>
+                                            <Label Text="{Binding Postcode}" HorizontalOptions="CenterAndExpand" FontSize="15" FontAttributes="Bold" TextColor="Black"/>
+                                            <Label Text="{Binding Notes}" HorizontalOptions="CenterAndExpand" FontSize="14" FontAttributes="Bold"  TextColor="Black"/>
+                                            <StackLayout Orientation="Horizontal" Spacing="20">
+                                                <Button Text="More Info" BackgroundColor="White" TextColor="Black" BorderColor="Black" BorderWidth="1" Clicked="MoreInfo_Clicked"/>
+                                            </StackLayout>
+                                            <!--info stack-->
+                                            <StackLayout IsVisible="{Binding IsInfoVisible}">
+                                                <Grid BackgroundColor="White" VerticalOptions="End" RowSpacing="5" ColumnSpacing="5">
+
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                <!-- Row 1 - Accept -->
+                                                <Frame Grid.Row="0" Grid.Column="0" Padding="5" HeightRequest="30" BorderColor="Black" BackgroundColor="White">
+                                                    <Frame.Triggers>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="Confirmed By Driver">
+                                                            <Setter Property="BackgroundColor" Value="Green"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="OtherStatus">
+                                                            <Setter Property="BackgroundColor" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Frame.Triggers>
+                                                    <Label Text="Accept"
+                                                           FontSize="13"
+                                                           TextColor="Black"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center">
+                                                                <Label.Triggers>
+                                                                    <DataTrigger TargetType="Label"
+                                                                                 Binding="{Binding Status}"
+                                                                                 Value="Confirmed By Driver">
+                                                                        <Setter Property="Text" Value="Accepted"/>
+                                                                    </DataTrigger>
+                                                                </Label.Triggers>
+                                                            </Label>
+                                                    <Frame.GestureRecognizers>
+                                                        <TapGestureRecognizer Tapped="Accept_Tapped"/>
+                                                    </Frame.GestureRecognizers>
+                                                </Frame>
+
+                                                <!-- Row 1 - Decline -->
+                                                <Frame Grid.Row="0"
+                                                       Grid.Column="1"
+                                                       Padding="5"
+                                                       HeightRequest="30"
+                                                       BorderColor="Black"
+                                                       BackgroundColor="White">
+                                                    <Frame.Triggers>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="Declined">
+                                                            <Setter Property="BackgroundColor" Value="red"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="OtherStatus">
+                                                            <Setter Property="BackgroundColor" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Frame.Triggers>
+                                                    <Label Text="Decline"
+                                                           FontSize="13"
+                                                           TextColor="Black"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center">
+                                                                <Label.Triggers>
+                                                                    <DataTrigger TargetType="Label"
+                                                                                 Binding="{Binding Status}"
+                                                                                 Value="Declined">
+                                                                        <Setter Property="Text" Value="Declined"/>
+                                                                    </DataTrigger>
+                                                                </Label.Triggers>
+                                                            </Label>
+                                                    <Frame.GestureRecognizers>
+                                                        <TapGestureRecognizer Tapped="Decline_Tapped"/>
+                                                    </Frame.GestureRecognizers>
+                                                </Frame>
+
+                                                <!-- Row 2 - Completed -->
+                                                <Frame Grid.Row="1"
+                                                       Grid.Column="0"
+                                                       Padding="5"
+                                                       HeightRequest="30"
+                                                       BorderColor="Black">
+                                                    <Frame.Triggers>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="Completed">
+                                                            <Setter Property="BackgroundColor" Value="LightGreen"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="OtherStatus">
+                                                            <Setter Property="BackgroundColor" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Frame.Triggers>
+
+                                                    <Label Text="Clear"
+                                                           FontSize="13"
+                                                           TextColor="Black"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center">
+                                                                <Label.Triggers>
+                                                                    <DataTrigger TargetType="Label"
+                                                                                 Binding="{Binding Status}"
+                                                                                 Value="Completed">
+                                                                        <Setter Property="Text" Value="Cleared"/>
+                                                                    </DataTrigger>
+                                                                </Label.Triggers>
+                                                            </Label>
+                                                    <Frame.GestureRecognizers>
+                                                        <TapGestureRecognizer Tapped="Complete_Tapped"/>
+                                                    </Frame.GestureRecognizers>
+                                                </Frame>
+
+
+                                                <!-- Row 2 - Note To Depot -->
+                                                <Frame Grid.Row="1"
+                                                       Grid.Column="1"
+                                                       Padding="5"
+                                                       HeightRequest="30"
+                                                       BorderColor="Black"
+                                                       BackgroundColor="White">
+                                                    <Label Text="Note To Depot"
+                                                           FontSize="13"
+                                                           TextColor="Black"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center"/>
+                                                    <Frame.GestureRecognizers>
+                                                        <TapGestureRecognizer Tapped="Notes_Tapped"/>
+                                                    </Frame.GestureRecognizers>
+                                                </Frame>
+
+                                                
+                                                <!-- Row 3 - Nothing To Collect -->
+                                                <Frame Grid.Row="2" Grid.Column="0" Padding="5" HeightRequest="30" BorderColor="Black" BackgroundColor="White">
+                                                    <Frame.Triggers>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="Nothing To Collect">
+                                                            <Setter Property="BackgroundColor" Value="OrangeRed"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="OtherStatus">
+                                                            <Setter Property="BackgroundColor" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Frame.Triggers>
+                                                    <Label Text="Nothing To Collect"
+                                                           FontSize="13"
+                                                           TextColor="Black"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center"/>
+                                                    <Frame.GestureRecognizers>
+                                                        <TapGestureRecognizer Tapped="NothingToCollect_Tapped"/>
+                                                    </Frame.GestureRecognizers>
+                                                </Frame>
+
+                                                <!-- Row 3 - Refuse -->
+                                                <Frame Grid.Row="2"
+                                                       Grid.Column="1"
+                                                       Padding="5"
+                                                       HeightRequest="30"
+                                                       BorderColor="Black"
+                                                       BackgroundColor="White">
+                                                    <Frame.Triggers>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="Refused">
+                                                            <Setter Property="BackgroundColor" Value="red"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Frame"
+                                                                     Binding="{Binding Status}"
+                                                                     Value="OtherStatus">
+                                                            <Setter Property="BackgroundColor" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Frame.Triggers>
+                                                    <Label Text="Refuse"
+                                                           FontSize="13"
+                                                           TextColor="Black"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center">
+                                                                <Label.Triggers>
+                                                                    <DataTrigger TargetType="Label"
+                                                                                 Binding="{Binding Status}"
+                                                                                 Value="Refused">
+                                                                        <Setter Property="Text" Value="Refused"/>
+                                                                    </DataTrigger>
+                                                                </Label.Triggers>
+                                                            </Label>
+                                                    <Frame.GestureRecognizers>
+                                                        <TapGestureRecognizer Tapped="Refuse_Tapped"/>
+                                                    </Frame.GestureRecognizers>
+                                                </Frame>
+
+                                            </Grid>
+                                            </StackLayout>
+                                        </StackLayout>
+                                    </Frame>
+
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <Label Text="No records found" 
+                       FontSize="Medium"
+                       TextColor="White"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                           Margin="0,50,0,0"
+                       IsVisible="{Binding ColDelList.Count, Converter={StaticResource InverseCountToVisibilityConverter}}"/>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+
+        <ActivityIndicator IsRunning="{Binding IsLoading}" Grid.Row="0" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+    </Grid>
+</ContentPage>
+

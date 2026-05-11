@@ -163,6 +163,41 @@ namespace legionexpress.Services
             return await AcceptCollectionPost(request, url);
         }
 
+        public async Task<AcceptCollectionResponse> RefuseCollection(refuseCollectionRequestModel request)
+        {
+            string url = $"api/v1/collection/refuse-collection";
+
+            return await RefuseCollectionPost(request, url);
+        }
+
+        public async Task<AcceptCollectionResponse> CompleteCollection(refuseCollectionRequestModel request)
+        {
+            string url = $"api/v1/collection/complete-collection";
+
+            return await RefuseCollectionPost(request, url);
+        }
+
+        public async Task<AcceptCollectionResponse> NothingToCollection(refuseCollectionRequestModel request)
+        {
+            string url = $"api/v1/collection/nothing-to-colect-collection";
+
+            return await RefuseCollectionPost(request, url);
+        }
+
+        public async Task<AcceptCollectionResponse> AcceptCollections(AcceptCollectionRequestListModel request)
+        {
+            string url = $"api/v1/collection/accept-collection";
+
+            return await AcceptCollectionsPost(request, url);
+        }
+
+        public async Task<AcceptCollectionResponse> DeclineCollections(refuseCollectionRequestModel request)
+        {
+            string url = $"api/v1/collection/decline-collection";
+
+            return await DeclineCollectionsPost(request, url);
+        }
+
         public async Task<UpdateDriverNotesResponse> UpdateDriverNotes(DriverNotesRequestModel request)
         {
             string url = $"api/v1/collection/update-driver-notes";

@@ -9,6 +9,8 @@ using Xamarin.Forms.Xaml;
 using Syncfusion.XForms.PopupLayout;
 using Rg.Plugins.Popup.Services;
 using legionexpress.Popups;
+using legionexpress.ViewModels;
+using Xamarin.Essentials;
 
 namespace legionexpress.Views
 {
@@ -18,13 +20,14 @@ namespace legionexpress.Views
         public CollectionHome()
         {
             InitializeComponent();
+            BindingContext = new DashboardViewModel();
             //popupLayout = new SfPopupLayout();
         }
 
-        private async void Logout_Clicked(object sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new Login());
-        }
+        //private async void Logout_Clicked(object sender, EventArgs e)
+        //{
+        //    await Navigation.PushAsync(new Login());
+        //}
 
         //private void ClickToShowPopup_Clicked(object sender, EventArgs e)
         //{
@@ -57,6 +60,12 @@ namespace legionexpress.Views
         private void Logout_Tapped(object sender, EventArgs e)
         {
             PopupNavigation.Instance.PushAsync(new Logout());
+        }
+
+        private void Logout_Clicked(object sender, EventArgs e)
+        {
+            Preferences.Remove("token");
+            Application.Current.MainPage = new NavigationPage(new Login());
         }
     }
 }

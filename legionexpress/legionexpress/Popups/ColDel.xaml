@@ -13,16 +13,17 @@
             EasingOut="SinIn"
             HasBackgroundAnimation="True"/>
     </rg:PopupPage.Animation>
-    <Grid RowDefinitions="*">
+    <Grid RowDefinitions="Auto,*">
         <StackLayout    VerticalOptions="CenterAndExpand" 
                         BackgroundColor="Transparent"
                         HorizontalOptions="FillAndExpand"
                         Grid.Row="0">
-        <Frame CornerRadius="5" Margin="5"  HorizontalOptions="FillAndExpand" BackgroundColor=" #000000 " HeightRequest="800">
-            <StackLayout>
+        <Frame CornerRadius="5" Margin="5,0"  HorizontalOptions="FillAndExpand" BackgroundColor=" #000000 " HeightRequest="800">
+            <StackLayout Padding="-10">
                 <Frame
                     Padding="5"
                     CornerRadius="5"
+                    HeightRequest="40"
                     HasShadow="True"
                     BackgroundColor="#0D0D0D"
                     BorderColor="#333333"
@@ -49,7 +50,6 @@
                             WidthRequest="100"
                             HeightRequest="40"
                             HorizontalOptions="End"
-
                             Command="{Binding DoneCommand}"
                             Style="{Binding DoneButtonStyle}" />
         

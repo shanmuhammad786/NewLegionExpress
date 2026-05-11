@@ -35,7 +35,7 @@ namespace legionexpress.ViewModels
         private async void ColDelList()
         {
             await PopupNavigation.Instance.PopAsync();
-            await (Application.Current.MainPage).Navigation.PushAsync(new ColDel());
+            await (Application.Current.MainPage).Navigation.PushAsync(new ColDelList());
         }
         private async void DeliveryScan()
         {

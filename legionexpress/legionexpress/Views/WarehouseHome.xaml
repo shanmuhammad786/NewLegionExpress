@@ -28,9 +28,9 @@
             </sfPopup:SfPopupLayout>-->
         <Grid RowDefinitions="70,*,70" HorizontalOptions="FillAndExpand" >
             <Image Grid.Row="0" Source="StraightChevrons" HeightRequest="60"  Margin="0,10">
-                <Image.GestureRecognizers>
+                <!--<Image.GestureRecognizers>
                     <TapGestureRecognizer Tapped="Logout_Tapped"/>
-                </Image.GestureRecognizers>
+                </Image.GestureRecognizers>-->
             </Image>
             <!--<Grid RowDefinitions="auto">-->
             <StackLayout Grid.Row="1" VerticalOptions="FillAndExpand">
