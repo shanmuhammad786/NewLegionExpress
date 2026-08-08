@@ -20,7 +20,7 @@ namespace legionexpress.Models
     {
     }
 
-    public class refuseCollectionRequestModel
+    public class CompleteCollectionRequestModel
     {
         public int id { get; set; }
     }
@@ -28,6 +28,15 @@ namespace legionexpress.Models
     public class AcceptCollectionRequestListModel
     {
         public List<int> ids { get; set; }
+    }
+
+    public class RefuseCollectionRequestModel
+    {
+        public int id { get; set; }
+
+        public string refusedNotes { get; set; }
+
+        public string personOnSite { get; set; }
     }
 }
 

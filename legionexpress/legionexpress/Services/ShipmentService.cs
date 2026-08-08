@@ -163,25 +163,25 @@ namespace legionexpress.Services
             return await AcceptCollectionPost(request, url);
         }
 
-        public async Task<AcceptCollectionResponse> RefuseCollection(refuseCollectionRequestModel request)
+        public async Task<AcceptCollectionResponse> RefuseCollection(RefuseCollectionRequestModel request)
         {
             string url = $"api/v1/collection/refuse-collection";
 
             return await RefuseCollectionPost(request, url);
         }
 
-        public async Task<AcceptCollectionResponse> CompleteCollection(refuseCollectionRequestModel request)
+        public async Task<AcceptCollectionResponse> CompleteCollection(CompleteCollectionRequestModel request)
         {
             string url = $"api/v1/collection/complete-collection";
 
-            return await RefuseCollectionPost(request, url);
+            return await CompleteCollectionPost(request, url);
         }
 
-        public async Task<AcceptCollectionResponse> NothingToCollection(refuseCollectionRequestModel request)
+        public async Task<AcceptCollectionResponse> NothingToCollection(CompleteCollectionRequestModel request)
         {
             string url = $"api/v1/collection/nothing-to-colect-collection";
 
-            return await RefuseCollectionPost(request, url);
+            return await CompleteCollectionPost(request, url);
         }
 
         public async Task<AcceptCollectionResponse> AcceptCollections(AcceptCollectionRequestListModel request)
@@ -191,7 +191,7 @@ namespace legionexpress.Services
             return await AcceptCollectionsPost(request, url);
         }
 
-        public async Task<AcceptCollectionResponse> DeclineCollections(refuseCollectionRequestModel request)
+        public async Task<AcceptCollectionResponse> DeclineCollections(CompleteCollectionRequestModel request)
         {
             string url = $"api/v1/collection/decline-collection";
 

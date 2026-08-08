@@ -216,31 +216,33 @@ namespace legionexpress.ViewModels
 
         public async void RefuseColleciton(DriverCollection selectedItem)
         {
-            try
-            {
-                this.IsLoading = true;
-                var obj = new refuseCollectionRequestModel
-                {
-                    id = selectedItem.Id,
-                };
-                var response = await _shipmentService.RefuseCollection(obj);
+            //try
+            //{
+            //    this.IsLoading = true;
+            //    var obj = new CompleteCollectionRequestModel
+            //    {
+            //        id = selectedItem.Id,
+            //    };
+            //    var response = await _shipmentService.RefuseCollection(obj);
 
-                if (response != null && !response.HasError && response.Result != null)
-                {
-                    await PopupNavigation.Instance.PushAsync(new AlertPopup("Success", "Collection Refuse Successfully"));
-                    LoadList();
+            //    if (response != null && !response.HasError && response.Result != null)
+            //    {
+            //        await PopupNavigation.Instance.PushAsync(new AlertPopup("Success", "Collection Refuse Successfully"));
+            //        LoadList();
 
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //}
+            //finally
+            //{
+            //    IsLoading = false;
+            //}
 
             //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
+            await PopupNavigation.Instance.PushAsync(
+                new RefuseCollections(selectedItem));
         }
 
         public async void CompleteColleciton(DriverCollection selectedItem)
@@ -248,7 +250,7 @@ namespace legionexpress.ViewModels
             try
             {
                 this.IsLoading = true;
-                var obj = new refuseCollectionRequestModel
+                var obj = new CompleteCollectionRequestModel
                 {
                     id = selectedItem.Id,
                 };
@@ -277,7 +279,7 @@ namespace legionexpress.ViewModels
             try
             {
                 this.IsLoading = true;
-                var obj = new refuseCollectionRequestModel
+                var obj = new CompleteCollectionRequestModel
                 {
                     id = selectedItem.Id,
                 };
@@ -306,7 +308,7 @@ namespace legionexpress.ViewModels
             try
             {
                 this.IsLoading = true;
-                var obj = new refuseCollectionRequestModel
+                var obj = new CompleteCollectionRequestModel
                 {
                     id = selectedItem.Id,
                 };

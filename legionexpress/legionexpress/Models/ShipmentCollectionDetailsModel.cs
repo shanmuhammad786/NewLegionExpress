@@ -16,6 +16,7 @@ namespace legionexpress.Models
         public string id { get; set; }
         public string customerName { get; set; }
         public int itemToScanCount { get; set; }
+        public int scannedItemCount { get; set; }
         public int outstandingItemToScanCount { get; set; }
     }
    

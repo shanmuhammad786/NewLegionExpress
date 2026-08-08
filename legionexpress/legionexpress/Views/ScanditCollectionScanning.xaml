@@ -46,7 +46,7 @@
                 <Frame BackgroundColor="Black" HorizontalOptions="CenterAndExpand" CornerRadius="10" BorderColor="Orange">
                     <StackLayout>
                         <Label Text="Items Expected" TextColor="White"/>
-                        <Label Text="{Binding ShipmentDetails.result.outstandingItemToScanCount}" TextColor="White" FontAttributes="Bold" HorizontalOptions="CenterAndExpand"/>
+                        <Label Text="{Binding ShipmentDetails.result.scannedItemCount}" TextColor="White" FontAttributes="Bold" HorizontalOptions="CenterAndExpand"/>
                     </StackLayout> 
                 </Frame>
                 
