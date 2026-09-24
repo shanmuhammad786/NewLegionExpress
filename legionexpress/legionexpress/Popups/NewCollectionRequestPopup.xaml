@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rg:PopupPage xmlns="http://xamarin.com/schemas/2014/forms"
+              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:rg="http://rotorgames.com"
+              xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup"
+              x:Class="legionexpress.Popups.NewCollectionRequestPopup"
+              CloseWhenBackgroundIsClicked="False"
+              BackgroundColor="#99000000">
+    <rg:PopupPage.Animation>
+        <animations:ScaleAnimation PositionIn="Center"
+                                   PositionOut="Center"
+                                   DurationIn="150"
+                                   DurationOut="150"
+                                   EasingIn="SinOut"
+                                   EasingOut="SinIn"
+                                   HasBackgroundAnimation="True" />
+    </rg:PopupPage.Animation>
+
+    <Grid x:Name="PopupRoot"
+          VerticalOptions="Center"
+          HorizontalOptions="FillAndExpand"
+          Margin="28,0"
+          HeightRequest="280">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Stacked cards behind the active one -->
+        <Frame x:Name="StackCard3"
+               IsVisible="False"
+               CornerRadius="18"
+               BorderColor="#F5A623"
+               BackgroundColor="#111111"
+               HasShadow="False"
+               Padding="0"
+               HeightRequest="220"
+               VerticalOptions="Start"
+               Margin="18,0,18,0"
+               TranslationY="-28" />
+
+        <Frame x:Name="StackCard2"
+               IsVisible="False"
+               CornerRadius="18"
+               BorderColor="#F5A623"
+               BackgroundColor="#111111"
+               HasShadow="False"
+               Padding="0"
+               HeightRequest="220"
+               VerticalOptions="Start"
+               Margin="12,0,12,0"
+               TranslationY="-18" />
+
+        <Frame x:Name="StackCard1"
+               IsVisible="False"
+               CornerRadius="18"
+               BorderColor="#F5A623"
+               BackgroundColor="#111111"
+               HasShadow="False"
+               Padding="0"
+               HeightRequest="220"
+               VerticalOptions="Start"
+               Margin="6,0,6,0"
+               TranslationY="-9" />
+
+        <!-- Active card -->
+        <Frame x:Name="ActiveCard"
+               CornerRadius="18"
+               BorderColor="#F5A623"
+               BackgroundColor="#000000"
+               HasShadow="False"
+               Padding="20"
+               HeightRequest="220"
+               VerticalOptions="Start">
+            <Grid RowSpacing="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label x:Name="TitleLabel"
+                       Grid.Row="0"
+                       Text="New Collection Request"
+                       TextColor="White"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center" />
+
+                <StackLayout Grid.Row="1"
+                             VerticalOptions="Center"
+                             Spacing="6">
+                    <Label x:Name="CustomerNameLabel"
+                           TextColor="White"
+                           FontSize="26"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="TailTruncation" />
+                    <Label x:Name="PostcodeLabel"
+                           TextColor="White"
+                           FontSize="26"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                    <Label x:Name="NotesLabel"
+                           IsVisible="False"
+                           TextColor="#F7D046"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
+                </StackLayout>
+
+                <Grid x:Name="ButtonsGrid"
+                      Grid.Row="2"
+                      ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="OkButton"
+                            Grid.Column="0"
+                            Text="OK"
+                            TextColor="White"
+                            BackgroundColor="#F5A623"
+                            CornerRadius="8"
+                            HeightRequest="44"
+                            Clicked="Ok_Clicked" />
+                    <Button x:Name="CancelButton"
+                            Grid.Column="1"
+                            Text="Cancel"
+                            TextColor="Black"
+                            BackgroundColor="#F7D046"
+                            CornerRadius="8"
+                            HeightRequest="44"
+                            Clicked="Cancel_Clicked" />
+                </Grid>
+            </Grid>
+        </Frame>
+    </Grid>
+</rg:PopupPage>

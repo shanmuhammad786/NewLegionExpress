@@ -1,12 +1,12 @@
 ﻿using legionexpress.Models;
 using legionexpress.Popups;
 using legionexpress.Services;
+using Newtonsoft.Json;
 using Rg.Plugins.Popup.Services;
-using Scandit.DataCapture.Barcode.Capture.Unified;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -18,6 +18,8 @@ namespace legionexpress.ViewModels
         #region PrivateProperties
         private ObservableCollection<DriverCollection> _colDelList;
         private readonly ShipmentService _shipmentService;
+        private readonly NotificationHubService _notificationHubService;
+        private NewCollectionRequestPopup _collectionAlertPopup;
         private int _selectedFilter = 3;
         private bool _isLoading;
         #endregion
@@ -88,16 +90,262 @@ namespace legionexpress.ViewModels
         public ColDelViewModel()
         {
             _shipmentService = new ShipmentService();
+            _notificationHubService = new NotificationHubService();
             ColDelList = new ObservableCollection<DriverCollection>();
             MessagingCenter.Subscribe<object, bool>(this, "RefreshList", HandleRefresh);
             LoadList();
-            //LoadList();
         }
         private void HandleRefresh(object sender, bool shouldRefresh)
         {
             if (shouldRefresh)
             {
                 LoadList();
+            }
+        }
+
+        public async Task StartNotificationsAsync()
+        {
+            if (Device.RuntimePlatform != Device.Android)
+                return;
+
+            _notificationHubService.MessageReceived -= OnNotificationReceived;
+            _notificationHubService.MessageReceived += OnNotificationReceived;
+            await _notificationHubService.ConnectAsync();
+        }
+
+        public async Task StopNotificationsAsync()
+        {
+            if (Device.RuntimePlatform != Device.Android)
+                return;
+
+            _notificationHubService.MessageReceived -= OnNotificationReceived;
+            await _notificationHubService.DisconnectAsync();
+        }
+
+        private void OnNotificationReceived(string payload)
+        {
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                await HandleNotificationAsync(payload);
+            });
+        }
+
+        private async Task HandleNotificationAsync(string payload)
+        {
+            if (string.IsNullOrWhiteSpace(payload))
+                return;
+
+            try
+            {
+                var notification = JsonConvert.DeserializeObject<NotificationPayloadModel>(payload);
+                if (notification?.Data == null || string.IsNullOrWhiteSpace(notification.Event))
+                    return;
+
+                List<CollectionAlertItem> alerts;
+                if (string.Equals(notification.Event, "CollectionAssigned", StringComparison.OrdinalIgnoreCase))
+                {
+                    alerts = BuildCollectionAssignedAlerts(notification.Data);
+                }
+                else if (string.Equals(notification.Event, "NewCollectionNotes", StringComparison.OrdinalIgnoreCase))
+                {
+                    alerts = BuildNewCollectionNotesAlerts(notification.Data);
+                }
+                else
+                {
+                    return;
+                }
+
+                if (alerts.Count == 0)
+                    return;
+
+                // Refresh list so updated collections/notes appear behind the popups.
+                await LoadList(SelectedFilter == 0 ? (int?)0 : null);
+                await ShowCollectionAlertsAsync(alerts);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Notification handling failed: {ex.Message}");
+            }
+        }
+
+        private static List<CollectionAlertItem> BuildCollectionAssignedAlerts(NotificationDataModel data)
+        {
+            var alerts = new List<CollectionAlertItem>();
+
+            if (data.Collections != null && data.Collections.Count > 0)
+            {
+                foreach (var collection in data.Collections)
+                {
+                    if (collection == null || collection.Id <= 0)
+                        continue;
+
+                    alerts.Add(new CollectionAlertItem
+                    {
+                        Id = collection.Id,
+                        CustomerName = collection.CustomerName,
+                        Postcode = collection.PostCode,
+                        AlertType = CollectionAlertType.CollectionAssigned
+                    });
+                }
+
+                return alerts;
+            }
+
+            // Fallback for older payloads that only sent a single collection id.
+            if (data.Id > 0)
+            {
+                alerts.Add(new CollectionAlertItem
+                {
+                    Id = data.Id,
+                    AlertType = CollectionAlertType.CollectionAssigned
+                });
+            }
+
+            return alerts;
+        }
+
+        private static List<CollectionAlertItem> BuildNewCollectionNotesAlerts(NotificationDataModel data)
+        {
+            var alerts = new List<CollectionAlertItem>();
+            var collection = data.Collection;
+            if (collection == null || collection.Id <= 0)
+                return alerts;
+
+            alerts.Add(new CollectionAlertItem
+            {
+                Id = collection.Id,
+                CustomerName = collection.CustomerName,
+                Postcode = collection.PostCode,
+                Notes = collection.Notes,
+                AlertType = CollectionAlertType.NewCollectionNotes
+            });
+
+            return alerts;
+        }
+
+        private async Task ShowCollectionAlertsAsync(IList<CollectionAlertItem> alerts)
+        {
+            if (alerts == null || alerts.Count == 0)
+                return;
+
+            var newAlerts = alerts
+                .Where(a => a != null && a.Id > 0)
+                .Where(a => _collectionAlertPopup == null || !_collectionAlertPopup.ContainsAlert(a))
+                .GroupBy(a => new { a.Id, a.AlertType })
+                .Select(g => g.First())
+                .ToList();
+
+            if (newAlerts.Count == 0)
+                return;
+
+            if (_collectionAlertPopup != null)
+            {
+                foreach (var alert in newAlerts)
+                    _collectionAlertPopup.Enqueue(alert);
+                return;
+            }
+
+            _collectionAlertPopup = new NewCollectionRequestPopup(
+                newAlerts[0],
+                AcceptCollectionFromAlertAsync,
+                DeclineCollectionFromAlertAsync,
+                AcknowledgeNotesFromAlertAsync,
+                () => _collectionAlertPopup = null);
+
+            for (var i = 1; i < newAlerts.Count; i++)
+                _collectionAlertPopup.Enqueue(newAlerts[i]);
+
+            await PopupNavigation.Instance.PushAsync(_collectionAlertPopup);
+        }
+
+        /// <summary>
+        /// OK on SignalR collection alert — same accept API used by the Col/Del list.
+        /// </summary>
+        private async Task<bool> AcceptCollectionFromAlertAsync(CollectionAlertItem alert)
+        {
+            try
+            {
+                IsLoading = true;
+                var request = new AcceptCollectionRequestListModel
+                {
+                    ids = new List<int> { alert.Id }
+                };
+                var response = await _shipmentService.AcceptCollections(request);
+
+                if (response != null && !response.HasError)
+                {
+                    await LoadList(SelectedFilter == 0 ? (int?)0 : null);
+                    return true;
+                }
+
+                await PopupNavigation.Instance.PushAsync(
+                    new AlertPopup("Error", response?.ErrorMessage ?? "Unable to accept collection"));
+                return false;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Accept from alert failed: {ex.Message}");
+                await PopupNavigation.Instance.PushAsync(
+                    new AlertPopup("Error", "Unable to accept collection"));
+                return false;
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        /// <summary>
+        /// Cancel on SignalR collection alert — same decline API used by the Col/Del list.
+        /// </summary>
+        private async Task<bool> DeclineCollectionFromAlertAsync(CollectionAlertItem alert)
+        {
+            try
+            {
+                IsLoading = true;
+                var request = new CompleteCollectionRequestModel
+                {
+                    id = alert.Id
+                };
+                var response = await _shipmentService.DeclineCollections(request);
+
+                if (response != null && !response.HasError)
+                {
+                    await LoadList(SelectedFilter == 0 ? (int?)0 : null);
+                    return true;
+                }
+
+                await PopupNavigation.Instance.PushAsync(
+                    new AlertPopup("Error", response?.ErrorMessage ?? "Unable to decline collection"));
+                return false;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Decline from alert failed: {ex.Message}");
+                await PopupNavigation.Instance.PushAsync(
+                    new AlertPopup("Error", "Unable to decline collection"));
+                return false;
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        /// <summary>
+        /// OK on notes alert — acknowledge only, then refresh list.
+        /// </summary>
+        private async Task<bool> AcknowledgeNotesFromAlertAsync(CollectionAlertItem alert)
+        {
+            try
+            {
+                await LoadList(SelectedFilter == 0 ? (int?)0 : null);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Acknowledge notes failed: {ex.Message}");
+                return true;
             }
         }
         #region Commands

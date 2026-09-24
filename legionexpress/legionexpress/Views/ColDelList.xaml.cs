@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using legionexpress.Models;
 using legionexpress.ViewModels;
 using Xamarin.Forms;
@@ -7,12 +6,33 @@ using Xamarin.Forms;
 namespace legionexpress.Views
 {	
 	public partial class ColDelList : ContentPage
-	{	
+    {
+        private ColDelViewModel ViewModel => BindingContext as ColDelViewModel;
+
 		public ColDelList ()
 		{
 			InitializeComponent ();
             BindingContext = new ColDelViewModel();
         }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            if (Device.RuntimePlatform == Device.Android && ViewModel != null)
+            {
+                await ViewModel.StartNotificationsAsync();
+            }
+        }
+
+        protected override async void OnDisappearing()
+        {
+            base.OnDisappearing();
+            if (Device.RuntimePlatform == Device.Android && ViewModel != null)
+            {
+                await ViewModel.StopNotificationsAsync();
+            }
+        }
+
         private void Accept_Tapped(object sender, EventArgs e)
         {
             if (sender is Frame frame && frame.BindingContext is DriverCollection selectedItem)
@@ -84,4 +104,3 @@ namespace legionexpress.Views
         }
     }
 }
-
