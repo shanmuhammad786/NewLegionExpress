@@ -61,30 +61,39 @@ namespace legionexpress.Services
                 onClosed: () => _activePopup = null,
                 onStackCompleted: async () =>
                 {
-                    // Always drop handled alerts from the SignalR offline queue so they
-                    // do not reappear when opening ColDelList later.
-                    AppNotificationManager.Instance.RemoveAlertsFromQueue(newAlerts);
-
                     if (!syncNotificationCenter)
                         return;
 
-                    // Collection stacks: acknowledge matching notification log after full stack.
                     // Notes stacks already acknowledge on OK inside AcknowledgeNotesAsync.
-                    if (!isNotesStack)
+                    if (isNotesStack)
+                    {
+                        NotifyNotificationsUpdated();
+                        return;
+                    }
+
+                    // Collection stacks: acknowledge every distinct notification log in the stack.
+                    var logIds = newAlerts
+                        .Where(a => a != null && !a.IsNotesAlert)
+                        .Select(a => a.NotificationLogId)
+                        .Where(id => id.HasValue && id.Value > 0)
+                        .Select(id => id.Value)
+                        .Distinct()
+                        .ToList();
+
+                    if (logIds.Count == 0)
                     {
                         var logId = notificationLogId;
                         if (!logId.HasValue || logId.Value <= 0)
                             logId = await FindMatchingNotificationLogIdAsync(newAlerts);
 
                         if (logId.HasValue && logId.Value > 0)
-                            await TryAcknowledgeNotificationLogAsync(logId.Value);
-                        else
-                            NotifyNotificationsUpdated();
+                            logIds.Add(logId.Value);
                     }
+
+                    if (logIds.Count > 0)
+                        await AcknowledgeNotificationLogsAsync(logIds);
                     else
-                    {
                         NotifyNotificationsUpdated();
-                    }
                 });
 
             for (var i = 1; i < newAlerts.Count; i++)
@@ -178,14 +187,12 @@ namespace legionexpress.Services
 
                 if (syncNotificationCenter)
                 {
-                    AppNotificationManager.Instance.RemoveAlertsFromQueue(new List<CollectionAlertItem> { alert });
-
                     var logId = alert.NotificationLogId;
                     if (!logId.HasValue || logId.Value <= 0)
                         logId = await FindMatchingNotificationLogIdAsync(new List<CollectionAlertItem> { alert });
 
                     if (logId.HasValue && logId.Value > 0)
-                        await TryAcknowledgeNotificationLogAsync(logId.Value);
+                        await AcknowledgeNotificationLogsAsync(new[] { logId.Value });
                     else
                         NotifyNotificationsUpdated();
                 }
@@ -247,20 +254,30 @@ namespace legionexpress.Services
             return null;
         }
 
-        private async Task TryAcknowledgeNotificationLogAsync(int notificationLogId)
+        private async Task AcknowledgeNotificationLogsAsync(IEnumerable<int> notificationLogIds)
         {
-            try
-            {
-                await _notificationApiService.SetNotificationAcknowledged(notificationLogId);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Acknowledge notification log failed: {ex.Message}");
-            }
-            finally
+            if (notificationLogIds == null)
             {
                 NotifyNotificationsUpdated();
+                return;
             }
+
+            foreach (var notificationLogId in notificationLogIds.Distinct())
+            {
+                if (notificationLogId <= 0)
+                    continue;
+
+                try
+                {
+                    await _notificationApiService.SetNotificationAcknowledged(notificationLogId);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Acknowledge notification log failed: {ex.Message}");
+                }
+            }
+
+            NotifyNotificationsUpdated();
         }
 
         public static void NotifyNotificationsUpdated()

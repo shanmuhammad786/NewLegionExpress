@@ -106,24 +106,19 @@ namespace legionexpress.ViewModels
 
             await manager.StartAsync();
 
-            var queued = manager.TakeQueuedAlerts();
-            if (queued.Count > 0)
-            {
-                // Skip alerts already handled via notification list / acknowledge API.
-                queued = await FilterStillUnacknowledgedAlertsAsync(queued);
-            }
-
-            if (queued.Count > 0)
+            // Same source as the notification list page — unacknowledged API logs only.
+            var pending = await LoadPendingAlertsFromApiAsync();
+            if (pending.Count > 0)
             {
                 await LoadList(SelectedFilter == 0 ? (int?)0 : null);
                 await _alertPresenter.ShowAlertsAsync(
-                    queued,
+                    pending,
                     () => LoadList(SelectedFilter == 0 ? (int?)0 : null),
                     syncNotificationCenter: true);
             }
         }
 
-        private async Task<List<CollectionAlertItem>> FilterStillUnacknowledgedAlertsAsync(List<CollectionAlertItem> queued)
+        private async Task<List<CollectionAlertItem>> LoadPendingAlertsFromApiAsync()
         {
             try
             {
@@ -133,7 +128,7 @@ namespace legionexpress.ViewModels
                     .Where(l => l != null && !l.IsAcknowledged)
                     .ToList() ?? new List<NotificationLogModel>();
 
-                var stillActiveIds = new HashSet<string>();
+                var alerts = new List<CollectionAlertItem>();
                 foreach (var log in logs)
                 {
                     var item = NotificationListItem.FromLog(log);
@@ -141,17 +136,21 @@ namespace legionexpress.ViewModels
                         continue;
 
                     foreach (var alert in item.Alerts)
-                        stillActiveIds.Add($"{alert.AlertType}:{alert.Id}");
+                    {
+                        if (alert != null && alert.Id > 0)
+                            alerts.Add(alert);
+                    }
                 }
 
-                return queued
-                    .Where(a => a != null && stillActiveIds.Contains($"{a.AlertType}:{a.Id}"))
+                return alerts
+                    .GroupBy(a => new { a.Id, a.AlertType })
+                    .Select(g => g.First())
                     .ToList();
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Filter queued alerts failed: {ex.Message}");
-                return queued;
+                System.Diagnostics.Debug.WriteLine($"Load pending alerts failed: {ex.Message}");
+                return new List<CollectionAlertItem>();
             }
         }
 

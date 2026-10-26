@@ -54,15 +54,45 @@ namespace legionexpress.ViewModels
         {
             MessagingCenter.Subscribe<object>(this, CollectionAlertPresenter.NotificationsUpdatedMessage, sender =>
             {
-                Device.BeginInvokeOnMainThread(async () => await LoadAsync());
+                Device.BeginInvokeOnMainThread(async () => await LoadAsync(showLoading: false));
             });
         }
 
-        public async Task LoadAsync()
+        public void StartListeningForSignalR()
+        {
+            AppNotificationManager.Instance.UnacknowledgedCountMayHaveChanged -= OnSignalRNotification;
+            AppNotificationManager.Instance.UnacknowledgedCountMayHaveChanged += OnSignalRNotification;
+        }
+
+        public void StopListeningForSignalR()
+        {
+            AppNotificationManager.Instance.UnacknowledgedCountMayHaveChanged -= OnSignalRNotification;
+        }
+
+        private void OnSignalRNotification()
+        {
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                try
+                {
+                    // Brief delay so the notification log is available from the API.
+                    await Task.Delay(400);
+                    await LoadAsync(showLoading: false);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"SignalR notification list refresh failed: {ex.Message}");
+                }
+            });
+        }
+
+        public async Task LoadAsync(bool showLoading = true)
         {
             try
             {
-                IsLoading = true;
+                if (showLoading)
+                    IsLoading = true;
+
                 var response = await _notificationApiService.GetUserNotifications();
                 Notifications.Clear();
 
@@ -88,7 +118,8 @@ namespace legionexpress.ViewModels
             }
             finally
             {
-                IsLoading = false;
+                if (showLoading)
+                    IsLoading = false;
             }
         }
 

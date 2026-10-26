@@ -20,8 +20,17 @@ namespace legionexpress.Views
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            if (ViewModel != null)
-                await ViewModel.LoadAsync();
+            if (ViewModel == null)
+                return;
+
+            ViewModel.StartListeningForSignalR();
+            await ViewModel.LoadAsync();
+        }
+
+        protected override void OnDisappearing()
+        {
+            ViewModel?.StopListeningForSignalR();
+            base.OnDisappearing();
         }
 
         private async void NotificationsList_SelectionChanged(object sender, SelectionChangedEventArgs e)

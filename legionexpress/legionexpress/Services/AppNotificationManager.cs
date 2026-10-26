@@ -2,14 +2,14 @@ using legionexpress.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace legionexpress.Services
 {
     /// <summary>
-    /// App-wide Android SignalR connection + offline queue for Col/Del alerts.
+    /// App-wide Android SignalR connection. Live alerts are delivered only while ColDelList
+    /// is active; pending alerts when opening ColDelList come from the notification API.
     /// </summary>
     public class AppNotificationManager
     {
@@ -19,8 +19,6 @@ namespace legionexpress.Services
         public static AppNotificationManager Instance => _instance.Value;
 
         private readonly NotificationHubService _hubService = new NotificationHubService();
-        private readonly object _queueLock = new object();
-        private readonly List<CollectionAlertItem> _queuedAlerts = new List<CollectionAlertItem>();
 
         public bool IsColDelListActive { get; private set; }
 
@@ -51,7 +49,6 @@ namespace legionexpress.Services
                 return;
 
             _hubService.MessageReceived -= OnMessageReceived;
-            ClearQueue();
             IsColDelListActive = false;
             await _hubService.DisconnectAsync();
         }
@@ -64,42 +61,6 @@ namespace legionexpress.Services
         public void LeaveColDelList()
         {
             IsColDelListActive = false;
-        }
-
-        public List<CollectionAlertItem> TakeQueuedAlerts()
-        {
-            lock (_queueLock)
-            {
-                var items = _queuedAlerts.ToList();
-                _queuedAlerts.Clear();
-                return items;
-            }
-        }
-
-        public void RemoveAlertsFromQueue(IEnumerable<CollectionAlertItem> alerts)
-        {
-            if (alerts == null)
-                return;
-
-            lock (_queueLock)
-            {
-                foreach (var alert in alerts)
-                {
-                    if (alert == null)
-                        continue;
-
-                    _queuedAlerts.RemoveAll(x =>
-                        x.Id == alert.Id && x.AlertType == alert.AlertType);
-                }
-            }
-        }
-
-        public void ClearQueue()
-        {
-            lock (_queueLock)
-            {
-                _queuedAlerts.Clear();
-            }
         }
 
         private void OnMessageReceived(string payload)
@@ -117,13 +78,7 @@ namespace legionexpress.Services
                         return;
 
                     if (IsColDelListActive)
-                    {
                         LiveAlertsReceived?.Invoke(alerts);
-                    }
-                    else
-                    {
-                        EnqueueAlerts(alerts);
-                    }
 
                     UnacknowledgedCountMayHaveChanged?.Invoke();
                 }
@@ -132,23 +87,6 @@ namespace legionexpress.Services
                     System.Diagnostics.Debug.WriteLine($"AppNotificationManager handle failed: {ex.Message}");
                 }
             });
-        }
-
-        private void EnqueueAlerts(IList<CollectionAlertItem> alerts)
-        {
-            lock (_queueLock)
-            {
-                foreach (var alert in alerts)
-                {
-                    if (alert == null || alert.Id <= 0)
-                        continue;
-
-                    if (_queuedAlerts.Any(x => x.Id == alert.Id && x.AlertType == alert.AlertType))
-                        continue;
-
-                    _queuedAlerts.Add(alert);
-                }
-            }
         }
     }
 }
