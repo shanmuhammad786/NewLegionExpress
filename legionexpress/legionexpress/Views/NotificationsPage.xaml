@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="legionexpress.Views.NotificationsPage"
+             Title="Notifications"
+             BackgroundColor="#000000"
+             NavigationPage.HasNavigationBar="True"
+             NavigationPage.BarBackgroundColor="#121212"
+             NavigationPage.BarTextColor="White">
+
+    <Grid>
+        <RefreshView IsRefreshing="{Binding IsLoading}"
+                     Command="{Binding RefreshCommand}"
+                     RefreshColor="#F5A623">
+            <CollectionView x:Name="NotificationsList"
+                            ItemsSource="{Binding Notifications}"
+                            SelectionMode="Single"
+                            SelectionChanged="NotificationsList_SelectionChanged">
+                <CollectionView.EmptyView>
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Padding="24">
+                        <Label Text="No notifications"
+                               TextColor="#9A9A9A"
+                               FontSize="16"
+                               HorizontalTextAlignment="Center" />
+                    </StackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="16,14" ColumnDefinitions="Auto,*,Auto" BackgroundColor="#000000">
+                            <BoxView Grid.Column="0"
+                                     WidthRequest="10"
+                                     HeightRequest="10"
+                                     CornerRadius="5"
+                                     Color="#3B82F6"
+                                     VerticalOptions="Start"
+                                     Margin="0,6,12,0" />
+
+                            <StackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="{Binding Title}"
+                                       TextColor="White"
+                                       FontAttributes="Bold"
+                                       FontSize="15" />
+                                <Label Text="{Binding Summary}"
+                                       TextColor="#E5E5E5"
+                                       FontSize="14"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding DetailLine}"
+                                       TextColor="#9A9A9A"
+                                       FontSize="12"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding TypeLabel}"
+                                       TextColor="#F5A623"
+                                       FontSize="11"
+                                       Margin="0,2,0,0" />
+                            </StackLayout>
+
+                            <Label Grid.Column="2"
+                                   Text="›"
+                                   TextColor="#666666"
+                                   FontSize="22"
+                                   VerticalOptions="Center" />
+
+                            <BoxView Grid.Column="0"
+                                     Grid.ColumnSpan="3"
+                                     HeightRequest="1"
+                                     Color="#2C2C2C"
+                                     VerticalOptions="End" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="#F5A623"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

@@ -18,19 +18,15 @@ namespace legionexpress.Views
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            if (Device.RuntimePlatform == Device.Android && ViewModel != null)
-            {
-                await ViewModel.StartNotificationsAsync();
-            }
+            if (ViewModel != null)
+                await ViewModel.OnPageAppearingAsync();
         }
 
         protected override async void OnDisappearing()
         {
             base.OnDisappearing();
-            if (Device.RuntimePlatform == Device.Android && ViewModel != null)
-            {
-                await ViewModel.StopNotificationsAsync();
-            }
+            if (ViewModel != null)
+                await ViewModel.OnPageDisappearingAsync();
         }
 
         private void Accept_Tapped(object sender, EventArgs e)
@@ -38,7 +34,6 @@ namespace legionexpress.Views
             if (sender is Frame frame && frame.BindingContext is DriverCollection selectedItem)
             {
                 var vm = BindingContext as ColDelViewModel;
-                //vm?.Accept(selectedItem);
                 vm?.AcceptCollection(selectedItem);
             }
         }
@@ -49,7 +44,6 @@ namespace legionexpress.Views
             {
                 var vm = BindingContext as ColDelViewModel;
                 vm?.RefuseColleciton(selectedItem);
-                //vm?.Refuse(selectedItem);
             }
         }
 
@@ -59,7 +53,6 @@ namespace legionexpress.Views
             {
                 var vm = BindingContext as ColDelViewModel;
                 vm?.CompleteColleciton(selectedItem);
-                //vm?.Refuse(selectedItem);
             }
         }
 
@@ -69,7 +62,6 @@ namespace legionexpress.Views
             {
                 var vm = BindingContext as ColDelViewModel;
                 vm?.NothingToColleciton(selectedItem);
-                //vm?.Refuse(selectedItem);
             }
         }
 
@@ -79,7 +71,6 @@ namespace legionexpress.Views
             {
                 var vm = BindingContext as ColDelViewModel;
                 vm?.DeclineColleciton(selectedItem);
-                //vm?.Refuse(selectedItem);
             }
         }
 

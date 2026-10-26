@@ -1,7 +1,6 @@
 ﻿using legionexpress.Models;
 using legionexpress.Popups;
 using legionexpress.Services;
-using Newtonsoft.Json;
 using Rg.Plugins.Popup.Services;
 using System;
 using System.Collections.Generic;
@@ -18,8 +17,7 @@ namespace legionexpress.ViewModels
         #region PrivateProperties
         private ObservableCollection<DriverCollection> _colDelList;
         private readonly ShipmentService _shipmentService;
-        private readonly NotificationHubService _notificationHubService;
-        private NewCollectionRequestPopup _collectionAlertPopup;
+        private readonly CollectionAlertPresenter _alertPresenter;
         private int _selectedFilter = 3;
         private bool _isLoading;
         #endregion
@@ -49,7 +47,6 @@ namespace legionexpress.ViewModels
             {
                 _selectedFilter = value;
                 NotifyPropertyChanged();
-                // Also notify changes for button styles
                 NotifyPropertyChanged(nameof(AllButtonStyle));
                 NotifyPropertyChanged(nameof(DoneButtonStyle));
             }
@@ -63,8 +60,6 @@ namespace legionexpress.ViewModels
         public Style SelectedButtonStyle => _selectedButtonStyle ?? (_selectedButtonStyle = new Style(typeof(Button))
         {
             Setters = {
-        //new Setter { Property = Button.BackgroundColorProperty, Value = Color.Black },
-        //new Setter { Property = Button.TextColorProperty, Value = Color.White }
         new Setter { Property = Button.BackgroundColorProperty, Value = "#2E2E2E" },
         new Setter { Property = Button.TextColorProperty, Value = Color.White }
     }
@@ -74,10 +69,6 @@ namespace legionexpress.ViewModels
         public Style UnselectedButtonStyle => _unselectedButtonStyle ?? (_unselectedButtonStyle = new Style(typeof(Button))
         {
             Setters = {
-        //new Setter { Property = Button.BackgroundColorProperty, Value = Color.White },
-        //new Setter { Property = Button.TextColorProperty, Value = Color.Black },
-        //new Setter { Property = Button.BorderColorProperty, Value = Color.Black },
-        //new Setter { Property = Button.BorderWidthProperty, Value = 1 }
         new Setter { Property = Button.BackgroundColorProperty, Value = "#F2F2F2" },
         new Setter { Property = Button.TextColorProperty, Value = Color.Black },
         new Setter { Property = Button.BorderColorProperty, Value = "#5A5A5A" },
@@ -90,7 +81,7 @@ namespace legionexpress.ViewModels
         public ColDelViewModel()
         {
             _shipmentService = new ShipmentService();
-            _notificationHubService = new NotificationHubService();
+            _alertPresenter = new CollectionAlertPresenter();
             ColDelList = new ObservableCollection<DriverCollection>();
             MessagingCenter.Subscribe<object, bool>(this, "RefreshList", HandleRefresh);
             LoadList();
@@ -103,251 +94,99 @@ namespace legionexpress.ViewModels
             }
         }
 
-        public async Task StartNotificationsAsync()
+        public async Task OnPageAppearingAsync()
         {
             if (Device.RuntimePlatform != Device.Android)
                 return;
 
-            _notificationHubService.MessageReceived -= OnNotificationReceived;
-            _notificationHubService.MessageReceived += OnNotificationReceived;
-            await _notificationHubService.ConnectAsync();
+            var manager = AppNotificationManager.Instance;
+            manager.EnterColDelList();
+            manager.LiveAlertsReceived -= OnLiveAlertsReceived;
+            manager.LiveAlertsReceived += OnLiveAlertsReceived;
+
+            await manager.StartAsync();
+
+            var queued = manager.TakeQueuedAlerts();
+            if (queued.Count > 0)
+            {
+                // Skip alerts already handled via notification list / acknowledge API.
+                queued = await FilterStillUnacknowledgedAlertsAsync(queued);
+            }
+
+            if (queued.Count > 0)
+            {
+                await LoadList(SelectedFilter == 0 ? (int?)0 : null);
+                await _alertPresenter.ShowAlertsAsync(
+                    queued,
+                    () => LoadList(SelectedFilter == 0 ? (int?)0 : null),
+                    syncNotificationCenter: true);
+            }
         }
 
-        public async Task StopNotificationsAsync()
+        private async Task<List<CollectionAlertItem>> FilterStillUnacknowledgedAlertsAsync(List<CollectionAlertItem> queued)
+        {
+            try
+            {
+                var api = new NotificationApiService();
+                var response = await api.GetUserNotifications();
+                var logs = response?.Result?.NotificationLogs?
+                    .Where(l => l != null && !l.IsAcknowledged)
+                    .ToList() ?? new List<NotificationLogModel>();
+
+                var stillActiveIds = new HashSet<string>();
+                foreach (var log in logs)
+                {
+                    var item = NotificationListItem.FromLog(log);
+                    if (item?.Alerts == null)
+                        continue;
+
+                    foreach (var alert in item.Alerts)
+                        stillActiveIds.Add($"{alert.AlertType}:{alert.Id}");
+                }
+
+                return queued
+                    .Where(a => a != null && stillActiveIds.Contains($"{a.AlertType}:{a.Id}"))
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Filter queued alerts failed: {ex.Message}");
+                return queued;
+            }
+        }
+
+        public async Task OnPageDisappearingAsync()
         {
             if (Device.RuntimePlatform != Device.Android)
                 return;
 
-            _notificationHubService.MessageReceived -= OnNotificationReceived;
-            await _notificationHubService.DisconnectAsync();
+            var manager = AppNotificationManager.Instance;
+            manager.LiveAlertsReceived -= OnLiveAlertsReceived;
+            manager.LeaveColDelList();
+
+            // Unfinished popups are discarded and will not reappear on return.
+            await _alertPresenter.DismissActivePopupAsync();
         }
 
-        private void OnNotificationReceived(string payload)
+        private void OnLiveAlertsReceived(IList<CollectionAlertItem> alerts)
         {
             Device.BeginInvokeOnMainThread(async () =>
             {
-                await HandleNotificationAsync(payload);
+                try
+                {
+                    await LoadList(SelectedFilter == 0 ? (int?)0 : null);
+                    await _alertPresenter.ShowAlertsAsync(
+                        alerts,
+                        () => LoadList(SelectedFilter == 0 ? (int?)0 : null),
+                        syncNotificationCenter: true);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Live alert display failed: {ex.Message}");
+                }
             });
         }
 
-        private async Task HandleNotificationAsync(string payload)
-        {
-            if (string.IsNullOrWhiteSpace(payload))
-                return;
-
-            try
-            {
-                var notification = JsonConvert.DeserializeObject<NotificationPayloadModel>(payload);
-                if (notification?.Data == null || string.IsNullOrWhiteSpace(notification.Event))
-                    return;
-
-                List<CollectionAlertItem> alerts;
-                if (string.Equals(notification.Event, "CollectionAssigned", StringComparison.OrdinalIgnoreCase))
-                {
-                    alerts = BuildCollectionAssignedAlerts(notification.Data);
-                }
-                else if (string.Equals(notification.Event, "NewCollectionNotes", StringComparison.OrdinalIgnoreCase))
-                {
-                    alerts = BuildNewCollectionNotesAlerts(notification.Data);
-                }
-                else
-                {
-                    return;
-                }
-
-                if (alerts.Count == 0)
-                    return;
-
-                // Refresh list so updated collections/notes appear behind the popups.
-                await LoadList(SelectedFilter == 0 ? (int?)0 : null);
-                await ShowCollectionAlertsAsync(alerts);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Notification handling failed: {ex.Message}");
-            }
-        }
-
-        private static List<CollectionAlertItem> BuildCollectionAssignedAlerts(NotificationDataModel data)
-        {
-            var alerts = new List<CollectionAlertItem>();
-
-            if (data.Collections != null && data.Collections.Count > 0)
-            {
-                foreach (var collection in data.Collections)
-                {
-                    if (collection == null || collection.Id <= 0)
-                        continue;
-
-                    alerts.Add(new CollectionAlertItem
-                    {
-                        Id = collection.Id,
-                        CustomerName = collection.CustomerName,
-                        Postcode = collection.PostCode,
-                        AlertType = CollectionAlertType.CollectionAssigned
-                    });
-                }
-
-                return alerts;
-            }
-
-            // Fallback for older payloads that only sent a single collection id.
-            if (data.Id > 0)
-            {
-                alerts.Add(new CollectionAlertItem
-                {
-                    Id = data.Id,
-                    AlertType = CollectionAlertType.CollectionAssigned
-                });
-            }
-
-            return alerts;
-        }
-
-        private static List<CollectionAlertItem> BuildNewCollectionNotesAlerts(NotificationDataModel data)
-        {
-            var alerts = new List<CollectionAlertItem>();
-            var collection = data.Collection;
-            if (collection == null || collection.Id <= 0)
-                return alerts;
-
-            alerts.Add(new CollectionAlertItem
-            {
-                Id = collection.Id,
-                CustomerName = collection.CustomerName,
-                Postcode = collection.PostCode,
-                Notes = collection.Notes,
-                AlertType = CollectionAlertType.NewCollectionNotes
-            });
-
-            return alerts;
-        }
-
-        private async Task ShowCollectionAlertsAsync(IList<CollectionAlertItem> alerts)
-        {
-            if (alerts == null || alerts.Count == 0)
-                return;
-
-            var newAlerts = alerts
-                .Where(a => a != null && a.Id > 0)
-                .Where(a => _collectionAlertPopup == null || !_collectionAlertPopup.ContainsAlert(a))
-                .GroupBy(a => new { a.Id, a.AlertType })
-                .Select(g => g.First())
-                .ToList();
-
-            if (newAlerts.Count == 0)
-                return;
-
-            if (_collectionAlertPopup != null)
-            {
-                foreach (var alert in newAlerts)
-                    _collectionAlertPopup.Enqueue(alert);
-                return;
-            }
-
-            _collectionAlertPopup = new NewCollectionRequestPopup(
-                newAlerts[0],
-                AcceptCollectionFromAlertAsync,
-                DeclineCollectionFromAlertAsync,
-                AcknowledgeNotesFromAlertAsync,
-                () => _collectionAlertPopup = null);
-
-            for (var i = 1; i < newAlerts.Count; i++)
-                _collectionAlertPopup.Enqueue(newAlerts[i]);
-
-            await PopupNavigation.Instance.PushAsync(_collectionAlertPopup);
-        }
-
-        /// <summary>
-        /// OK on SignalR collection alert — same accept API used by the Col/Del list.
-        /// </summary>
-        private async Task<bool> AcceptCollectionFromAlertAsync(CollectionAlertItem alert)
-        {
-            try
-            {
-                IsLoading = true;
-                var request = new AcceptCollectionRequestListModel
-                {
-                    ids = new List<int> { alert.Id }
-                };
-                var response = await _shipmentService.AcceptCollections(request);
-
-                if (response != null && !response.HasError)
-                {
-                    await LoadList(SelectedFilter == 0 ? (int?)0 : null);
-                    return true;
-                }
-
-                await PopupNavigation.Instance.PushAsync(
-                    new AlertPopup("Error", response?.ErrorMessage ?? "Unable to accept collection"));
-                return false;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Accept from alert failed: {ex.Message}");
-                await PopupNavigation.Instance.PushAsync(
-                    new AlertPopup("Error", "Unable to accept collection"));
-                return false;
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
-
-        /// <summary>
-        /// Cancel on SignalR collection alert — same decline API used by the Col/Del list.
-        /// </summary>
-        private async Task<bool> DeclineCollectionFromAlertAsync(CollectionAlertItem alert)
-        {
-            try
-            {
-                IsLoading = true;
-                var request = new CompleteCollectionRequestModel
-                {
-                    id = alert.Id
-                };
-                var response = await _shipmentService.DeclineCollections(request);
-
-                if (response != null && !response.HasError)
-                {
-                    await LoadList(SelectedFilter == 0 ? (int?)0 : null);
-                    return true;
-                }
-
-                await PopupNavigation.Instance.PushAsync(
-                    new AlertPopup("Error", response?.ErrorMessage ?? "Unable to decline collection"));
-                return false;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Decline from alert failed: {ex.Message}");
-                await PopupNavigation.Instance.PushAsync(
-                    new AlertPopup("Error", "Unable to decline collection"));
-                return false;
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
-
-        /// <summary>
-        /// OK on notes alert — acknowledge only, then refresh list.
-        /// </summary>
-        private async Task<bool> AcknowledgeNotesFromAlertAsync(CollectionAlertItem alert)
-        {
-            try
-            {
-                await LoadList(SelectedFilter == 0 ? (int?)0 : null);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Acknowledge notes failed: {ex.Message}");
-                return true;
-            }
-        }
         #region Commands
         public ICommand RefuseCommand => new Command<DriverCollection>(Refuse);
         public ICommand ClosePopupCommand => new Command(ClosePopup);
@@ -381,7 +220,7 @@ namespace legionexpress.ViewModels
                 }
                 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally
@@ -389,10 +228,6 @@ namespace legionexpress.ViewModels
                 IsLoading = false;
             }
         }
-        //public async void Refuse()
-        //{
-        //    await PopupNavigation.Instance.PushAsync(new Refuse() { BindingContext = this});
-        //}
 
         public async void Refuse(DriverCollection selectedItem)
         {
@@ -422,15 +257,13 @@ namespace legionexpress.ViewModels
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally
             {
                 IsLoading = false;
             }
-
-            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
         }
 
         public async void AcceptCollection(DriverCollection selectedItem)
@@ -451,44 +284,17 @@ namespace legionexpress.ViewModels
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally
             {
                 IsLoading = false;
             }
-
-            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
         }
 
         public async void RefuseColleciton(DriverCollection selectedItem)
         {
-            //try
-            //{
-            //    this.IsLoading = true;
-            //    var obj = new CompleteCollectionRequestModel
-            //    {
-            //        id = selectedItem.Id,
-            //    };
-            //    var response = await _shipmentService.RefuseCollection(obj);
-
-            //    if (response != null && !response.HasError && response.Result != null)
-            //    {
-            //        await PopupNavigation.Instance.PushAsync(new AlertPopup("Success", "Collection Refuse Successfully"));
-            //        LoadList();
-
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //}
-            //finally
-            //{
-            //    IsLoading = false;
-            //}
-
-            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
             await PopupNavigation.Instance.PushAsync(
                 new RefuseCollections(selectedItem));
         }
@@ -511,15 +317,13 @@ namespace legionexpress.ViewModels
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally
             {
                 IsLoading = false;
             }
-
-            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
         }
 
         public async void NothingToColleciton(DriverCollection selectedItem)
@@ -540,15 +344,13 @@ namespace legionexpress.ViewModels
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally
             {
                 IsLoading = false;
             }
-
-            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
         }
 
         public async void DeclineColleciton(DriverCollection selectedItem)
@@ -569,15 +371,13 @@ namespace legionexpress.ViewModels
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally
             {
                 IsLoading = false;
             }
-
-            //await PopupNavigation.Instance.PushAsync(new Accept() { BindingContext = this });
         }
 
         public async void ClosePopup()

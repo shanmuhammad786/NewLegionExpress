@@ -21,6 +21,7 @@ namespace legionexpress.Models
         public string Message { get; set; }
 
         [JsonProperty("data")]
+        [JsonConverter(typeof(NotificationDataJsonConverter))]
         public NotificationDataModel Data { get; set; }
     }
 
@@ -28,6 +29,18 @@ namespace legionexpress.Models
     {
         [JsonProperty("id")]
         public int Id { get; set; }
+
+        [JsonProperty("collectionId")]
+        public int? CollectionId { get; set; }
+
+        [JsonProperty("notes")]
+        public string Notes { get; set; }
+
+        [JsonProperty("postCode")]
+        public string PostCode { get; set; }
+
+        [JsonProperty("customerName")]
+        public string CustomerName { get; set; }
 
         [JsonProperty("collections")]
         public List<NotificationCollectionModel> Collections { get; set; }
@@ -58,6 +71,7 @@ namespace legionexpress.Models
         public string Postcode { get; set; }
         public string Notes { get; set; }
         public CollectionAlertType AlertType { get; set; }
+        public int? NotificationLogId { get; set; }
 
         public bool IsNotesAlert => AlertType == CollectionAlertType.NewCollectionNotes;
     }

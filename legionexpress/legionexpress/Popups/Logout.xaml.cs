@@ -1,5 +1,6 @@
 ﻿using legionexpress.ViewModels;
 using legionexpress.Views;
+using legionexpress.Services;
 using Rg.Plugins.Popup.Pages;
 using Rg.Plugins.Popup.Services;
 using System;
@@ -23,8 +24,9 @@ namespace legionexpress.Popups
             PopupNavigation.Instance.PopAsync();
         }
 
-        private void Logout_Clicked(object sender, EventArgs e)
+        private async void Logout_Clicked(object sender, EventArgs e)
         {
+            await AppNotificationManager.Instance.StopAsync();
             Preferences.Remove("token");
             PopupNavigation.Instance.PopAsync();
             Application.Current.MainPage = new NavigationPage(new Login());

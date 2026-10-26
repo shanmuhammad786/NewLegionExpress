@@ -7,16 +7,60 @@
 
     <Grid RowDefinitions="70,*,70">
 
-        <!-- Top Chevrons -->
-        <Image Grid.Row="0"
-               Source="StraightChevrons"
-               HeightRequest="50"
-               Margin="0,15"
-               HorizontalOptions="Center">
-            <!--<Image.GestureRecognizers>
-                <TapGestureRecognizer Tapped="Logout_Tapped"/>
-            </Image.GestureRecognizers>-->
-        </Image>
+        <!-- Top Chevrons + Bell -->
+        <Grid Grid.Row="0" Margin="12,10,12,0">
+            <Image Source="StraightChevrons"
+                   HeightRequest="50"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+
+            <Grid HorizontalOptions="End"
+                  VerticalOptions="Center"
+                  WidthRequest="44"
+                  HeightRequest="44">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NotificationsCommand}" />
+                </Grid.GestureRecognizers>
+
+                <Frame BackgroundColor="#2E2E2E"
+                       CornerRadius="22"
+                       Padding="0"
+                       HasShadow="False"
+                       WidthRequest="44"
+                       HeightRequest="44"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                    <Label Text="🔔"
+                           FontSize="20"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center" />
+                </Frame>
+
+                <Frame IsVisible="{Binding HasUnreadNotifications}"
+                       BackgroundColor="#E53935"
+                       CornerRadius="10"
+                       Padding="0"
+                       HasShadow="False"
+                       WidthRequest="20"
+                       HeightRequest="20"
+                       HorizontalOptions="End"
+                       VerticalOptions="Start"
+                       Margin="0,-2,-2,0"
+                       TranslationX="2"
+                       TranslationY="-2">
+                    <Label Text="{Binding BadgeText}"
+                           TextColor="White"
+                           FontSize="10"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center" />
+                </Frame>
+            </Grid>
+        </Grid>
 
         <!-- Center Card -->
         <Grid Grid.Row="1"
@@ -32,7 +76,6 @@
 
                 <StackLayout Spacing="14">
 
-                    <!-- White Button -->
                     <Button Text="COLLECTION + DELIVERY LIST"
                             BackgroundColor="White"
                             TextColor="Black"
@@ -42,7 +85,6 @@
                             FontAttributes="Bold"
                             Command="{Binding ColDelListCommand}" />
 
-                    <!-- Dark Buttons -->
                     <Button Text="COLLECTION SCAN"
                             BackgroundColor="#2E2E2E"
                             TextColor="White"
@@ -76,12 +118,10 @@
                             BorderWidth="0.5"
                             Command="{Binding DeliveryScanCommand}" />
 
-                    <!-- Divider -->
                     <BoxView HeightRequest="1"
                              BackgroundColor="#2C2C2C"
                              Margin="0,10"/>
 
-                    <!-- Bottom Buttons -->
                     <Grid ColumnDefinitions="*,*"
                           ColumnSpacing="12">
 
@@ -109,7 +149,6 @@
             </Frame>
         </Grid>
 
-        <!-- Bottom Scan Icon -->
         <Image Grid.Row="2"
                Source="scan"
                HeightRequest="60"

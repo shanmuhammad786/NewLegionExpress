@@ -43,10 +43,14 @@ namespace legionexpress
             //DependencyService.Register<IMessageService, MessageService>();
         }
      
-        protected override void OnStart()
+        protected override async void OnStart()
         {
-            //MessagingCenter.Send(this, MessageKeys.OnStart);
             Preferences.Remove("ConsignmentKey");
+            var token = Preferences.Get("token", "default_value");
+            if (token != "default_value" && Xamarin.Forms.Device.RuntimePlatform == Xamarin.Forms.Device.Android)
+            {
+                await AppNotificationManager.Instance.StartAsync();
+            }
         }
 
         protected override async void OnSleep()

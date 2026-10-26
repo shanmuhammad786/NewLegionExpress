@@ -18,20 +18,24 @@ namespace legionexpress.Popups
         private readonly Func<CollectionAlertItem, Task<bool>> _onCancel;
         private readonly Func<CollectionAlertItem, Task<bool>> _onAcknowledgeNotes;
         private readonly Action _onClosed;
+        private readonly Func<Task> _onStackCompleted;
         private bool _isProcessing;
+        private bool _stackCompletedSuccessfully;
 
         public NewCollectionRequestPopup(
             CollectionAlertItem firstAlert,
             Func<CollectionAlertItem, Task<bool>> onAccept,
             Func<CollectionAlertItem, Task<bool>> onCancel,
             Func<CollectionAlertItem, Task<bool>> onAcknowledgeNotes,
-            Action onClosed = null)
+            Action onClosed = null,
+            Func<Task> onStackCompleted = null)
         {
             InitializeComponent();
             _onAccept = onAccept;
             _onCancel = onCancel;
             _onAcknowledgeNotes = onAcknowledgeNotes;
             _onClosed = onClosed;
+            _onStackCompleted = onStackCompleted;
             _alerts.Add(firstAlert);
             BindCurrentAlert();
         }
@@ -98,7 +102,7 @@ namespace legionexpress.Popups
             var current = _alerts.FirstOrDefault();
             if (current == null)
             {
-                await ClosePopupAsync();
+                await ClosePopupAsync(false);
                 return;
             }
 
@@ -121,7 +125,7 @@ namespace legionexpress.Popups
             var current = _alerts.FirstOrDefault();
             if (current == null)
             {
-                await ClosePopupAsync();
+                await ClosePopupAsync(false);
                 return;
             }
 
@@ -138,7 +142,8 @@ namespace legionexpress.Popups
 
                 if (_alerts.Count == 0)
                 {
-                    await ClosePopupAsync();
+                    _stackCompletedSuccessfully = true;
+                    await ClosePopupAsync(true);
                     return;
                 }
 
@@ -159,12 +164,24 @@ namespace legionexpress.Popups
                 CancelButton.IsEnabled = enabled;
         }
 
-        private async Task ClosePopupAsync()
+        private async Task ClosePopupAsync(bool completedSuccessfully)
         {
             _alerts.Clear();
             StackCard1.IsVisible = false;
             StackCard2.IsVisible = false;
             StackCard3.IsVisible = false;
+
+            if (completedSuccessfully && _stackCompletedSuccessfully && _onStackCompleted != null)
+            {
+                try
+                {
+                    await _onStackCompleted();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Stack completed callback failed: {ex.Message}");
+                }
+            }
 
             _onClosed?.Invoke();
 

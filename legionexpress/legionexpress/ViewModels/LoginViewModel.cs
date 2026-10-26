@@ -119,6 +119,8 @@ namespace legionexpress.ViewModels
                 if (authentication.hasError == false)
                 {
                     Preferences.Set("token", authentication.result.apiKey);
+                    if (Device.RuntimePlatform == Device.Android)
+                        await AppNotificationManager.Instance.StartAsync();
                     Application.Current.MainPage = new NavigationPage(new CollectionHome());
                 }
                 else
