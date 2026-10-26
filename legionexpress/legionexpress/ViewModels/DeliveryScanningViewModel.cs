@@ -376,43 +376,43 @@ namespace legionexpress.ViewModels
                     Utilty.CollectionScanCount = newCount;
 
                     //Preferences.Set("CollectionScannedCount", newCount.ToString());
-                    if (shipment.result != null)
+                    if (shipment.result != null && shipment.result.shipment != null)
                     {
                         string lengthAlert = string.Empty;
-                        if (shipment.result.declaredLengthCount > 0)
+                        if (shipment.result.shipment.declaredLengthCount > 0)
                         {
                             lengthAlert = "Length Alert";
                         }
                         string instructions = string.Empty;
-                        if (!string.IsNullOrEmpty(shipment.result.deliveryInstruction))
+                        if (!string.IsNullOrEmpty(shipment.result.shipment.deliveryInstruction))
                         {
-                            instructions = shipment.result.deliveryInstruction;
+                            instructions = shipment.result.shipment.deliveryInstruction;
                         }
                         string localPostalCode = string.Empty;
-                        var isLocalPost = await isLocalPostalAlert(shipment.result.deliveryPostcode);
+                        var isLocalPost = await isLocalPostalAlert(shipment.result.shipment.deliveryPostcode);
                         if (isLocalPost)
                         {
-                            localPostalCode = $"Local Delivery Alert: {shipment.result.deliveryPostcode}";
+                            localPostalCode = $"Local Delivery Alert: {shipment.result.shipment.deliveryPostcode}";
                         }
                         string worldOptionCode = string.Empty;
-                        var isWorldOptions = await isWorldOptionsAlert(shipment.result.deliveryPostcode);
+                        var isWorldOptions = await isWorldOptionsAlert(shipment.result.shipment.deliveryPostcode);
                         if (isWorldOptions)
                         {
-                            worldOptionCode = $"World Options Alert: {shipment.result.deliveryPostcode}";
+                            worldOptionCode = $"World Options Alert: {shipment.result.shipment.deliveryPostcode}";
                         }
-                        string[] str = shipment.result.parcelNumber.Split(' ');
+                        string[] str = shipment.result.shipment.parcelNumber.Split(' ');
                         var number = str[0];
-                        var consignmmentItem = shipment.result.consignmentItems.Where(x => x.itemNumber == number).FirstOrDefault();
+                        var consignmmentItem = shipment.result.shipment.consignmentItems.Where(x => x.itemNumber == number).FirstOrDefault();
                         Preferences.Set("ConsignmentKey", consignmmentItem.id.ToString());
-                        if (shipment.isAlreadyScanned)
+                        if (shipment.result.isWarehouseScanned)
                         {
 
-                            await PopupNavigation.Instance.PushAsync(new AlreadyScanned(lengthAlert, instructions, shipment.result, localPostalCode, worldOptionCode));
+                            await PopupNavigation.Instance.PushAsync(new AlreadyScanned(lengthAlert, instructions, shipment.result.shipment, localPostalCode, worldOptionCode));
                             IsLoading = false;
                         }
                         else
                         {
-                            if (shipment.result.declaredLengthCount > 0 || !string.IsNullOrEmpty(instructions) || !string.IsNullOrEmpty(localPostalCode) || !string.IsNullOrEmpty(worldOptionCode))
+                            if (shipment.result.shipment.declaredLengthCount > 0 || !string.IsNullOrEmpty(instructions) || !string.IsNullOrEmpty(localPostalCode) || !string.IsNullOrEmpty(worldOptionCode))
                             {
                                 IsLoading = false;
                                 await PopupNavigation.Instance.PushAsync(new Instructions(lengthAlert, instructions, localPostalCode, worldOptionCode) { BindingContext = this });

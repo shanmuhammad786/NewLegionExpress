@@ -11,7 +11,7 @@ using System.Net;
 
 namespace legionexpress.Droid
 {
-    [Activity(Label = "legionexpress", Icon = "@drawable/appIcon", Theme = "@style/MainTheme", MainLauncher = false, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
+    [Activity(Label = "legionexpress", Icon = "@drawable/appIcon", Theme = "@style/MainTheme", MainLauncher = true, Exported = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize )]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
@@ -20,19 +20,21 @@ namespace legionexpress.Droid
             ToolbarResource = Resource.Layout.Toolbar;
             base.OnCreate(savedInstanceState);
 
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            Rg.Plugins.Popup.Popup.Init(this);
-            //MessagingCenter.Subscribe<string>("1", "GetToken", (sender) =>
-            //{
-            //    FirbaseGetInstance();
-            //});
-           // FirbaseGetInstance();
-           // IsPlayServicesAvailable();
-            LoadApplication(new App());
-            Xamarin.Forms.Application.Current
-                .On<Xamarin.Forms.PlatformConfiguration.Android>()
-                .UseWindowSoftInputModeAdjust(WindowSoftInputModeAdjust.Resize);
+            try
+            {
+                Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+                global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+                Rg.Plugins.Popup.Popup.Init(this);
+                LoadApplication(new App());
+                Xamarin.Forms.Application.Current
+                    .On<Xamarin.Forms.PlatformConfiguration.Android>()
+                    .UseWindowSoftInputModeAdjust(WindowSoftInputModeAdjust.Resize);
+            }
+            catch (Exception ex)
+            {
+                Android.Util.Log.Error("MainActivity", "App startup failed: " + ex);
+                throw;
+            }
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {

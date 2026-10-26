@@ -673,7 +673,7 @@ namespace legionexpress.Services
             }
         }
 
-        protected async Task<ShipmentDetailsModel> PostShipmentWarehouseScanned<T>(Object obj, string url, string barcode, bool isCollection)
+        protected async Task<ShipmentWarehouseDetailsModel> PostShipmentWarehouseScanned(Object obj, string url, string barcode, bool isCollection)
         {
             var username = Preferences.Get("Username", "default_value");
 
@@ -693,7 +693,7 @@ namespace legionexpress.Services
                     request.Headers.Add("X-ApiKey", token);
                     responseMessage = await httpClient.SendAsync(request);
                     var response = await responseMessage.Content.ReadAsStringAsync();
-                    var data = JsonConvert.DeserializeObject<ShipmentDetailsModel>(response);
+                    var data = JsonConvert.DeserializeObject<ShipmentWarehouseDetailsModel>(response);
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
                         Dictionary<string, string> scanNOtOKProperties = new Dictionary<string, string>();
@@ -701,7 +701,7 @@ namespace legionexpress.Services
                         scanNOtOKProperties.Add("Barcode", barcode);
                         scanNOtOKProperties.Add("Username", username);
                         Analytics.TrackEvent("Scanning is not OK", scanNOtOKProperties);
-                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", data.errorMessage));
+                        await PopupNavigation.Instance.PushAsync(new AlertPopup("Error", data?.errorMessage ?? "Something went wrong please try again"));
                         return data;
                     }
                     Dictionary<string, string> scanOKProperties = new Dictionary<string, string>();

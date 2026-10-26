@@ -52,6 +52,7 @@ namespace legionexpress.Models
         public string dimensionsChangeRequest { get; set; }
         public Color scanItemBackground { get; set; }
         public bool isCollectionScanned { get; set; }
+        public bool isWarehouseScanned { get; set; }
         public double? changeRequestLength { get; set; }
         public double? changeRequestWidth { get; set; }
         public double? changeRequestHeight { get; set; }

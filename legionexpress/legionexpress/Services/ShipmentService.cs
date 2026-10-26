@@ -130,14 +130,14 @@ namespace legionexpress.Services
             string url = $"api/v1/shipment/shipment-collection-scan";
             return await PostShipmentCollectionScanned<ShipmentCollectionDetailsModel>(obj,url, networkId, true);
         }
-        public async Task<ShipmentDetailsModel> ShipmentWarehouseScanned(string networkId)
+        public async Task<ShipmentWarehouseDetailsModel> ShipmentWarehouseScanned(string networkId)
         {
             var obj = new
             {
                 networkShipmentId = networkId
             };
             string url = $"api/v1/shipment/shipment-warehouse-scan";
-            return await PostShipmentWarehouseScanned<ShipmentDetailsModel>(obj, url, networkId, false);
+            return await PostShipmentWarehouseScanned(obj, url, networkId, false);
         }
         public async Task<DriverCollectionResponse> DriverCollection(int? status = null)
         {

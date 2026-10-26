@@ -59,18 +59,14 @@ namespace legionexpress
                 }
                 var navigationList = MainPage.Navigation.NavigationStack.ToList();
                 var isCurrentPageLogin = navigationList.Any(x => x.GetType().Name == "Login");
-                if(!isCurrentPageLogin)
+                if (!isCurrentPageLogin)
                 {
                     MainPage = new NavigationPage(new CollectionHome());
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
-               
             }
-       
-            //MessagingCenter.Send(this, MessageKeys.OnSleep);
         }
 
         protected override void OnResume()
